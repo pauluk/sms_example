@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./theme-toggle"
-import { LogOut, Settings, Users, Layout, BarChart3 } from "lucide-react"
+import { LogOut, Settings, Users, Layout, BarChart3, Search } from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface HeaderProps {
@@ -19,17 +19,36 @@ interface HeaderProps {
 export function Header({ user }: HeaderProps) {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
+  const [canAccessGDPR, setCanAccessGDPR] = useState(false)
+
+  const isAdmin = user?.role === "admin"
+  const isTeam = user && !isAdmin
 
   useEffect(() => {
     setMounted(true)
-  }, [])
+
+    // Fetch system config to check GDPR visibility (public/restricted logic handled by API proxy or public endpoint)
+    // We switched to checking /api/system/config which is public-ish
+    fetch("/api/system/config")
+      .then(res => res.json())
+      .then(data => {
+        if (data) {
+          if (isAdmin && data.showGdprToAdmin) {
+            setCanAccessGDPR(true);
+          } else if (!isAdmin && data.showGdprToTeams) {
+            setCanAccessGDPR(true);
+          }
+        }
+      })
+      .catch(console.error)
+  }, [isAdmin])
 
   const handleSignOut = async () => {
     await authClient.signOut()
     router.push("/")
   }
 
-  const isAdmin = user?.role === "admin"
+
 
   if (!mounted) {
     return null
@@ -64,6 +83,15 @@ export function Header({ user }: HeaderProps) {
                 Usage
               </Button>
             </Link>
+
+            {canAccessGDPR && (
+              <Link href="/dashboard/gdpr">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
+                  <Search className="mr-2 h-4 w-4" />
+                  GDPR
+                </Button>
+              </Link>
+            )}
 
             {isAdmin && (
               <>

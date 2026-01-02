@@ -16,6 +16,8 @@ export default function AdminSettingsPage() {
     const [showUsageToTeams, setShowUsageToTeams] = useState(false);
     const [showUserStoriesToTeams, setShowUserStoriesToTeams] = useState(false);
     const [maintenanceMode, setMaintenanceMode] = useState(false);
+    const [showGdprToAdmin, setShowGdprToAdmin] = useState(true);
+    const [showGdprToTeams, setShowGdprToTeams] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
@@ -37,6 +39,8 @@ export default function AdminSettingsPage() {
                     if (data.showUsageToTeams !== undefined) setShowUsageToTeams(data.showUsageToTeams);
                     if (data.showUserStoriesToTeams !== undefined) setShowUserStoriesToTeams(data.showUserStoriesToTeams);
                     if (data.maintenanceMode !== undefined) setMaintenanceMode(data.maintenanceMode);
+                    if (data.showGdprToAdmin !== undefined) setShowGdprToAdmin(data.showGdprToAdmin);
+                    if (data.showGdprToTeams !== undefined) setShowGdprToTeams(data.showGdprToTeams);
                 }
                 setLoading(false);
             })
@@ -58,7 +62,9 @@ export default function AdminSettingsPage() {
                     smsQuota,
                     showUsageToTeams,
                     showUserStoriesToTeams,
-                    maintenanceMode
+                    maintenanceMode,
+                    showGdprToAdmin,
+                    showGdprToTeams
                 }),
             });
             if (!res.ok) throw new Error("Failed to save");
@@ -190,6 +196,32 @@ export default function AdminSettingsPage() {
                                 checked={maintenanceMode}
                                 onCheckedChange={setMaintenanceMode}
                                 className="data-[state=checked]:bg-red-600"
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 mt-4">
+                            <div>
+                                <h3 className="font-medium text-gray-900">Show GDPR Search to Admin</h3>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    If enabled, Admins can access GDPR Mobile Search.
+                                </p>
+                            </div>
+                            <Switch
+                                checked={showGdprToAdmin}
+                                onCheckedChange={setShowGdprToAdmin}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 mt-4">
+                            <div>
+                                <h3 className="font-medium text-gray-900">Show GDPR Search to Teams</h3>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    If enabled, Regular Team users can access GDPR Mobile Search.
+                                </p>
+                            </div>
+                            <Switch
+                                checked={showGdprToTeams}
+                                onCheckedChange={setShowGdprToTeams}
                             />
                         </div>
                     </div>
