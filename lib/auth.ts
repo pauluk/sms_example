@@ -23,7 +23,7 @@ export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: "pg",
     }),
-    trustedOrigins: ["http://localhost:3000", "http://192.168.0.199:3000"],
+    trustedOrigins: ["http://localhost:3000", "http://192.168.0.199:3000", "https://sms-example-omega.vercel.app", "https://poc.sms.risen108010.co.uk"],
     rateLimit: {
         window: 60,
         max: 100,
