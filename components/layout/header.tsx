@@ -22,7 +22,8 @@ export function Header({ user }: HeaderProps) {
   const [canAccessGDPR, setCanAccessGDPR] = useState(false)
 
   const isAdmin = user?.role === "admin"
-  const isTeam = user && !isAdmin
+  const isGDPR = user?.role === "gdpr"
+  const isTeam = user && !isAdmin && !isGDPR
 
   useEffect(() => {
     setMounted(true)
@@ -71,20 +72,24 @@ export function Header({ user }: HeaderProps) {
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center gap-1">
-            <Link href="/dashboard">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
-                <Layout className="mr-2 h-4 w-4" />
-                Dashboard
-              </Button>
-            </Link>
-            <Link href="/dashboard/usage">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
-                <BarChart3 className="mr-2 h-4 w-4" />
-                Usage
-              </Button>
-            </Link>
+            {!isGDPR && (
+              <>
+                <Link href="/dashboard">
+                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
+                    <Layout className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Button>
+                </Link>
+                <Link href="/dashboard/usage">
+                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
+                    <BarChart3 className="mr-2 h-4 w-4" />
+                    Usage
+                  </Button>
+                </Link>
+              </>
+            )}
 
-            {canAccessGDPR && (
+            {(canAccessGDPR || isGDPR) && (
               <Link href="/dashboard/gdpr">
                 <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
                   <Search className="mr-2 h-4 w-4" />

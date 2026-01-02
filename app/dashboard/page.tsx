@@ -38,11 +38,18 @@ export default function Dashboard() {
   useEffect(() => {
     if (session?.user) {
       const user = session.user as any
+
+      // Redirect GDPR users
+      if (user.role === 'gdpr') {
+        router.replace('/dashboard/gdpr');
+        return;
+      }
+
       if (user.teamId && user.role !== "admin") {
         setActiveTeamKey(user.teamId)
       }
     }
-  }, [session])
+  }, [session, router])
 
   // Fetch audit logs when team changes
   useEffect(() => {

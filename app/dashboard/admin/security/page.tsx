@@ -6,7 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldCheck, ShieldAlert, RefreshCw, Loader2, ExternalLink, Package } from "lucide-react";
+import { ShieldCheck, ShieldAlert, RefreshCw, Loader2, ExternalLink, Package, FileText, Download } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface Dependency {
     name: string;
@@ -27,6 +29,7 @@ export default function SecurityAuditPage() {
     const [loading, setLoading] = useState(true);
     const [scanning, setScanning] = useState(false);
     const [error, setError] = useState("");
+    const [filter, setFilter] = useState<'all' | 'vulnerable' | 'outdated'>('all');
 
     const fetchDependencies = async () => {
         setLoading(true);
@@ -115,6 +118,92 @@ export default function SecurityAuditPage() {
         setScanning(false);
     };
 
+    const filteredDependencies = dependencies.filter(dep => {
+        if (filter === 'vulnerable') return dep.vulnerability?.isVulnerable;
+        if (filter === 'outdated') return dep.latest && dep.latest !== dep.version;
+        return true;
+    });
+
+    const handleExportPDF = () => {
+        const doc = new jsPDF();
+
+        // Title
+        doc.setFontSize(18);
+        doc.text("Security Audit Report", 14, 22);
+
+        // Metadata
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+        doc.text(`App Version: v${appVersion}`, 14, 35);
+        doc.text(`Filter Applied: ${filter.charAt(0).toUpperCase() + filter.slice(1)}`, 14, 40);
+
+        const vulnCount = filteredDependencies.filter(d => d.vulnerability?.isVulnerable).length;
+        doc.text(`Vulnerabilities (in view): ${vulnCount}`, 14, 45);
+
+        // Table
+        const tableBody = filteredDependencies.map(dep => [
+            dep.name,
+            dep.type,
+            dep.version,
+            dep.latest || "-",
+            dep.vulnerability?.isVulnerable ? "VULNERABLE" : "Pass",
+            dep.vulnerability?.details || "-"
+        ]);
+
+        autoTable(doc, {
+            head: [["Package", "Type", "Installed", "Latest", "Status", "Details"]],
+            body: tableBody,
+            startY: 50,
+            styles: { fontSize: 8 },
+            headStyles: { fillColor: [41, 128, 185] },
+            alternateRowStyles: { fillColor: [245, 245, 245] },
+            didParseCell: (data) => {
+                if (data.section === 'body' && data.column.index === 4) {
+                    if (data.cell.raw === "VULNERABLE") {
+                        data.cell.styles.textColor = [200, 0, 0];
+                        data.cell.styles.fontStyle = 'bold';
+                    } else {
+                        data.cell.styles.textColor = [0, 100, 0];
+                    }
+                }
+            }
+        });
+
+        doc.save(`security-audit-${filter}-${new Date().toISOString().split('T')[0]}.pdf`);
+    };
+
+    const handleExportTXT = () => {
+        let content = `SECURITY AUDIT REPORT\n`;
+        content += `=====================\n`;
+        content += `Generated: ${new Date().toLocaleString()}\n`;
+        content += `App Version: v${appVersion}\n`;
+        content += `Filter Applied: ${filter}\n`;
+        content += `Packages Listed: ${filteredDependencies.length}\n\n`;
+
+        content += `DEPENDENCY DETAILS\n`;
+        content += `------------------\n`;
+
+        filteredDependencies.forEach(dep => {
+            const status = dep.vulnerability?.isVulnerable ? "VULNERABLE" : "PASS";
+            const latest = dep.latest ? `(Latest: ${dep.latest})` : "";
+            content += `[${status}] ${dep.name} @ ${dep.version} ${latest}\n`;
+            if (dep.vulnerability?.isVulnerable) {
+                content += `   WARN: ${dep.vulnerability.details}\n`;
+            }
+        });
+
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `security-audit-${filter}-${new Date().toISOString().split('T')[0]}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    };
+
     const vulnCount = dependencies.filter(d => d.vulnerability?.isVulnerable).length;
     const outdatedCount = dependencies.filter(d => d.latest && d.latest !== d.version).length;
 
@@ -130,10 +219,20 @@ export default function SecurityAuditPage() {
                         Scan installed dependencies against the OSV database and NPM registry for security and version health.
                     </p>
                 </div>
-                <Button onClick={handleRunScan} disabled={scanning || loading}>
-                    {scanning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
-                    {scanning ? "Scanning..." : "Run Security Scan"}
-                </Button>
+                <div className="flex gap-2">
+                    <Button variant="outline" onClick={handleExportPDF} disabled={dependencies.length === 0}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        PDF
+                    </Button>
+                    <Button variant="outline" onClick={handleExportTXT} disabled={dependencies.length === 0}>
+                        <Download className="mr-2 h-4 w-4" />
+                        TXT
+                    </Button>
+                    <Button onClick={handleRunScan} disabled={scanning || loading}>
+                        {scanning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+                        {scanning ? "Scanning..." : "Run Security Scan"}
+                    </Button>
+                </div>
             </div>
 
             {error && (
@@ -145,15 +244,22 @@ export default function SecurityAuditPage() {
             )}
 
             <div className="grid gap-4 md:grid-cols-3">
-                <Card>
+                <Card
+                    className={`cursor-pointer transition-colors ${filter === 'all' ? 'border-primary ring-1 ring-primary' : 'hover:bg-accent'}`}
+                    onClick={() => setFilter('all')}
+                >
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium">Total Dependencies</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{dependencies.length}</div>
+                        <p className="text-xs text-muted-foreground mt-1">Click to view all</p>
                     </CardContent>
                 </Card>
-                <Card className={vulnCount > 0 ? "border-red-500 bg-red-50" : ""}>
+                <Card
+                    className={`cursor-pointer transition-colors ${filter === 'vulnerable' ? 'border-red-500 ring-1 ring-red-500 bg-red-50' : 'hover:bg-red-50/50'} ${vulnCount > 0 ? "border-red-200" : ""}`}
+                    onClick={() => setFilter('vulnerable')}
+                >
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium">Vulnerabilities Found</CardTitle>
                     </CardHeader>
@@ -161,9 +267,13 @@ export default function SecurityAuditPage() {
                         <div className={`text-2xl font-bold ${vulnCount > 0 ? "text-red-700" : "text-green-600"}`}>
                             {vulnCount}
                         </div>
+                        <p className="text-xs text-muted-foreground mt-1">Click to filter vulnerable</p>
                     </CardContent>
                 </Card>
-                <Card className={outdatedCount > 0 ? "border-yellow-500 bg-yellow-50" : ""}>
+                <Card
+                    className={`cursor-pointer transition-colors ${filter === 'outdated' ? 'border-yellow-500 ring-1 ring-yellow-500 bg-yellow-50' : 'hover:bg-yellow-50/50'} ${outdatedCount > 0 ? "border-yellow-200" : ""}`}
+                    onClick={() => setFilter('outdated')}
+                >
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium">Outdated Packages</CardTitle>
                     </CardHeader>
@@ -171,16 +281,26 @@ export default function SecurityAuditPage() {
                         <div className={`text-2xl font-bold ${outdatedCount > 0 ? "text-yellow-700" : "text-green-600"}`}>
                             {outdatedCount}
                         </div>
+                        <p className="text-xs text-muted-foreground mt-1">Click to filter outdated</p>
                     </CardContent>
                 </Card>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Dependency List</CardTitle>
-                    <CardDescription>
-                        Direct from system `package.json`.
-                    </CardDescription>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <CardTitle>Dependency List</CardTitle>
+                            <CardDescription>
+                                Showing {filter} packages ({filteredDependencies.length}).
+                            </CardDescription>
+                        </div>
+                        {filter !== 'all' && (
+                            <Button variant="ghost" size="sm" onClick={() => setFilter('all')}>
+                                Clear Filter
+                            </Button>
+                        )}
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <div className="rounded-md border">
@@ -196,14 +316,14 @@ export default function SecurityAuditPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {dependencies.length === 0 && !loading && (
+                                {filteredDependencies.length === 0 && !loading && (
                                     <TableRow>
                                         <TableCell colSpan={6} className="text-center py-8">
-                                            No dependencies found or API error.
+                                            No packages found matching filter "{filter}".
                                         </TableCell>
                                     </TableRow>
                                 )}
-                                {dependencies.map((dep) => (
+                                {filteredDependencies.map((dep) => (
                                     <TableRow key={dep.name}>
                                         <TableCell className="font-medium flex items-center gap-2">
                                             <Package className="h-4 w-4 text-muted-foreground" />

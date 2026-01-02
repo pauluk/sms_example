@@ -161,6 +161,7 @@ export default function UsersPage() {
                                 >
                                     <option value="user">User</option>
                                     <option value="admin">Admin</option>
+                                    <option value="gdpr">GDPR</option>
                                 </select>
                             </div>
                             <div>

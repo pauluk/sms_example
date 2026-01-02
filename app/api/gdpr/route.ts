@@ -23,7 +23,9 @@ export async function GET(req: NextRequest) {
 
         let isAllowed = false;
 
-        if (isAdmin) {
+        if (session.user.role === 'gdpr') {
+            isAllowed = true;
+        } else if (isAdmin) {
             const adminConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'show_gdpr_to_admin'));
             isAllowed = adminConfig[0]?.value !== 'false'; // Default TRUE for admins
         } else {
