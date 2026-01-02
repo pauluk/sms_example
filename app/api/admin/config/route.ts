@@ -29,7 +29,13 @@ export async function GET(req: NextRequest) {
         const smsConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'enable_live_sms'));
         const enableLiveSms = smsConfig[0]?.value === 'true';
 
-        return NextResponse.json({ allowedDomains, enableLiveSms });
+        const quotaConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'sms_quota'));
+        const smsQuota = parseInt(quotaConfig[0]?.value || '30000');
+
+        const visibilityConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'show_usage_to_teams'));
+        const showUsageToTeams = visibilityConfig[0]?.value === 'true';
+
+        return NextResponse.json({ allowedDomains, enableLiveSms, smsQuota, showUsageToTeams });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -46,7 +52,7 @@ export async function PUT(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { allowedDomains, enableLiveSms } = body;
+        const { allowedDomains, enableLiveSms, smsQuota, showUsageToTeams } = body;
 
         if (allowedDomains !== undefined) {
             await db.insert(systemConfig)
@@ -58,6 +64,18 @@ export async function PUT(req: NextRequest) {
             await db.insert(systemConfig)
                 .values({ key: 'enable_live_sms', value: String(enableLiveSms) })
                 .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(enableLiveSms), updatedAt: new Date() } });
+        }
+
+        if (smsQuota !== undefined) {
+            await db.insert(systemConfig)
+                .values({ key: 'sms_quota', value: String(smsQuota) })
+                .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(smsQuota), updatedAt: new Date() } });
+        }
+
+        if (showUsageToTeams !== undefined) {
+            await db.insert(systemConfig)
+                .values({ key: 'show_usage_to_teams', value: String(showUsageToTeams) })
+                .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(showUsageToTeams), updatedAt: new Date() } });
         }
 
         return NextResponse.json({ success: true });

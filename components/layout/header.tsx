@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./theme-toggle"
-import { LogOut, Settings, Users, Layout } from "lucide-react"
+import { LogOut, Settings, Users, Layout, BarChart3 } from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface HeaderProps {
@@ -56,6 +56,12 @@ export function Header({ user }: HeaderProps) {
               <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
                 <Layout className="mr-2 h-4 w-4" />
                 Dashboard
+              </Button>
+            </Link>
+            <Link href="/dashboard/usage">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
+                <BarChart3 className="mr-2 h-4 w-4" />
+                Usage
               </Button>
             </Link>
 

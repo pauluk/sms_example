@@ -12,6 +12,8 @@ export default function AdminSettingsPage() {
     const { data: session } = authClient.useSession();
     const [allowedDomains, setAllowedDomains] = useState("");
     const [enableLiveSms, setEnableLiveSms] = useState(false);
+    const [smsQuota, setSmsQuota] = useState(30000);
+    const [showUsageToTeams, setShowUsageToTeams] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
@@ -29,6 +31,8 @@ export default function AdminSettingsPage() {
                 if (data) {
                     if (data.allowedDomains) setAllowedDomains(data.allowedDomains);
                     if (data.enableLiveSms !== undefined) setEnableLiveSms(data.enableLiveSms);
+                    if (data.smsQuota !== undefined) setSmsQuota(data.smsQuota);
+                    if (data.showUsageToTeams !== undefined) setShowUsageToTeams(data.showUsageToTeams);
                 }
                 setLoading(false);
             })
@@ -44,7 +48,7 @@ export default function AdminSettingsPage() {
             const res = await fetch("/api/admin/config", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ allowedDomains, enableLiveSms }),
+                body: JSON.stringify({ allowedDomains, enableLiveSms, smsQuota, showUsageToTeams }),
             });
             if (!res.ok) throw new Error("Failed to save");
             alert("Settings saved successfully");
@@ -117,6 +121,34 @@ export default function AdminSettingsPage() {
                             <Switch
                                 checked={enableLiveSms}
                                 onCheckedChange={setEnableLiveSms}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 mt-4">
+                            <div>
+                                <h3 className="font-medium text-gray-900">Monthly Usage Quota</h3>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Set the monthly limit for SMS messages.
+                                </p>
+                            </div>
+                            <input
+                                type="number"
+                                value={smsQuota}
+                                onChange={(e) => setSmsQuota(parseInt(e.target.value) || 0)}
+                                className="w-32 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 mt-4">
+                            <div>
+                                <h3 className="font-medium text-gray-900">Show Usage to Teams</h3>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    If enabled, non-admin users can see the Usage page.
+                                </p>
+                            </div>
+                            <Switch
+                                checked={showUsageToTeams}
+                                onCheckedChange={setShowUsageToTeams}
                             />
                         </div>
                     </div>
