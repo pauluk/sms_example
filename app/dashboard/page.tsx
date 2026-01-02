@@ -8,6 +8,7 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { TeamSelector } from "@/components/dashboard/team-selector"
 import { TemplateCard } from "@/components/dashboard/template-card"
 import { MessageEditor } from "@/components/dashboard/message-editor"
+import { BulkUpload } from "@/components/dashboard/bulk-upload"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -152,6 +153,16 @@ export default function Dashboard() {
               )
             }
 
+            // Bulk Upload View
+            if (viewMode === "BULK") {
+              return (
+                <BulkUpload
+                  team={team}
+                  onBack={() => setViewMode("SELECTION")}
+                />
+              )
+            }
+
             // History View
             if (viewMode === "HISTORY") {
               return (
@@ -218,9 +229,13 @@ export default function Dashboard() {
                     <History className="h-4 w-4" />
                     View History ({auditLogs.length})
                   </Button>
-                  <Button variant="outline" className="gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setViewMode("BULK")}
+                    className="gap-2"
+                  >
                     <UploadCloud className="h-4 w-4" />
-                    Bulk Send (Coming Soon)
+                    Bulk Send
                   </Button>
                 </div>
 
