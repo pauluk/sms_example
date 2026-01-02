@@ -8,7 +8,11 @@ export async function GET(req: NextRequest) {
     try {
         const config = await db.select().from(systemConfig).where(eq(systemConfig.key, 'allowed_domains'));
         const value = config[0]?.value || '';
-        return NextResponse.json({ allowedDomains: value });
+
+        const maintenanceConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'maintenance_mode'));
+        const maintenanceMode = maintenanceConfig[0]?.value === 'true';
+
+        return NextResponse.json({ allowedDomains: value, maintenanceMode });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

@@ -15,6 +15,7 @@ export default function AdminSettingsPage() {
     const [smsQuota, setSmsQuota] = useState(30000);
     const [showUsageToTeams, setShowUsageToTeams] = useState(false);
     const [showUserStoriesToTeams, setShowUserStoriesToTeams] = useState(false);
+    const [maintenanceMode, setMaintenanceMode] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
@@ -35,6 +36,7 @@ export default function AdminSettingsPage() {
                     if (data.smsQuota !== undefined) setSmsQuota(data.smsQuota);
                     if (data.showUsageToTeams !== undefined) setShowUsageToTeams(data.showUsageToTeams);
                     if (data.showUserStoriesToTeams !== undefined) setShowUserStoriesToTeams(data.showUserStoriesToTeams);
+                    if (data.maintenanceMode !== undefined) setMaintenanceMode(data.maintenanceMode);
                 }
                 setLoading(false);
             })
@@ -50,7 +52,14 @@ export default function AdminSettingsPage() {
             const res = await fetch("/api/admin/config", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ allowedDomains, enableLiveSms, smsQuota, showUsageToTeams, showUserStoriesToTeams }),
+                body: JSON.stringify({
+                    allowedDomains,
+                    enableLiveSms,
+                    smsQuota,
+                    showUsageToTeams,
+                    showUserStoriesToTeams,
+                    maintenanceMode
+                }),
             });
             if (!res.ok) throw new Error("Failed to save");
             alert("Settings saved successfully");
@@ -164,6 +173,23 @@ export default function AdminSettingsPage() {
                             <Switch
                                 checked={showUserStoriesToTeams}
                                 onCheckedChange={setShowUserStoriesToTeams}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200 mt-4">
+                            <div>
+                                <h3 className="font-medium text-red-900 flex items-center gap-2">
+                                    <AlertTriangle className="h-4 w-4" />
+                                    Maintenance Mode
+                                </h3>
+                                <p className="text-sm text-red-700 mt-1">
+                                    If enabled, ALL non-admin users will be blocked from logging in.
+                                </p>
+                            </div>
+                            <Switch
+                                checked={maintenanceMode}
+                                onCheckedChange={setMaintenanceMode}
+                                className="data-[state=checked]:bg-red-600"
                             />
                         </div>
                     </div>
