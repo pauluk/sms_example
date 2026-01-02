@@ -17,6 +17,12 @@ export function Footer() {
                         <BookOpen className="h-4 w-4" />
                         User Stories
                     </Link>
+                    <Link href="/dashboard/admin/go-live" className="text-muted-foreground hover:text-primary transition-colors">
+                        Gov Submission
+                    </Link>
+                    <Link href="/dashboard/technical" className="text-muted-foreground hover:text-primary transition-colors">
+                        Technical
+                    </Link>
                 </div>
             </div>
         </footer>

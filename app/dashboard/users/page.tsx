@@ -3,8 +3,10 @@
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Shield, User, Mail, Calendar } from "lucide-react";
+import { ArrowLeft, Shield, User, Mail, Calendar, Ban } from "lucide-react";
 import { TEAMS } from "@/config/teams";
+import { format } from "date-fns";
+import { Switch } from "@/components/ui/switch";
 
 export default function UsersPage() {
     const { data: session, isPending } = authClient.useSession();
@@ -49,7 +51,8 @@ export default function UsersPage() {
                 body: JSON.stringify({
                     userId: editingUser.id,
                     role: editingUser.role,
-                    teamId: editingUser.teamId
+                    teamId: editingUser.teamId,
+                    banned: editingUser.banned
                 })
             });
             if (res.ok) {
@@ -100,7 +103,17 @@ export default function UsersPage() {
                                             <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs uppercase">
                                                 {u.name.substring(0, 2)}
                                             </div>
-                                            {u.name}
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    {u.name}
+                                                    {u.banned && (
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                                            <Ban className="w-3 h-3 mr-1" />
+                                                            Banned
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 text-gray-600">
                                             <div className="flex items-center gap-2"><Mail className="w-3 h-3" />{u.email}</div>
@@ -115,7 +128,7 @@ export default function UsersPage() {
                                             {u.teamId ? TEAMS[u.teamId]?.label || u.teamId : <span className="text-gray-400 italic">No Team</span>}
                                         </td>
                                         <td className="px-6 py-4 text-gray-500 font-mono text-xs">
-                                            {new Date(u.createdAt).toLocaleDateString('en-GB')}
+                                            {u.createdAt ? format(new Date(u.createdAt), 'dd/MM/yyyy') : '-'}
                                         </td>
                                         <td className="px-6 py-4">
                                             <button
@@ -162,6 +175,17 @@ export default function UsersPage() {
                                         <option key={key} value={key}>{team.label}</option>
                                     ))}
                                 </select>
+                            </div>
+
+                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded border">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-900">Ban User</label>
+                                    <p className="text-xs text-gray-500">Prevent this user from accessing the system.</p>
+                                </div>
+                                <Switch
+                                    checked={editingUser.banned || false}
+                                    onCheckedChange={(checked) => setEditingUser({ ...editingUser, banned: checked })}
+                                />
                             </div>
                             <div className="flex justify-end gap-3 mt-6">
                                 <button

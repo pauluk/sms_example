@@ -26,7 +26,7 @@ export async function PUT(req: Request) {
 
     try {
         const body = await req.json();
-        const { userId, role, teamId } = body;
+        const { userId, role, teamId, banned } = body;
 
         if (!userId) {
             return NextResponse.json({ error: "User ID required" }, { status: 400 });
@@ -35,7 +35,8 @@ export async function PUT(req: Request) {
         await db.update(user)
             .set({
                 role: role || 'user',
-                teamId: teamId || null
+                teamId: teamId || null,
+                banned: banned
             })
             .where(eq(user.id, userId));
 

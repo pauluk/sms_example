@@ -38,7 +38,7 @@ const USER_STORIES = [
         id: "US-003",
         role: "Admin",
         feature: "User Management",
-        story: "I want to view, manage, and assign roles/teams to users so that the system is organized.",
+        story: "I want to view, manage, and assign roles/teams to users so that the system is organised.",
         status: "Completed",
         priority: "Medium"
     },
