@@ -120,153 +120,145 @@ export default function Dashboard() {
   const activeTeam = TEAMS[activeTeamKey]
 
   return (
-    <DashboardLayout
-      user={{
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      }}
-    >
-      <div className="space-y-6">
-        {/* Page Header */}
-        <div>
-          <h1 className="text-3xl font-bold">Send SMS Messages</h1>
-          <p className="text-muted-foreground mt-1">
-            Create and send SMS messages using GOV.UK Notify
-          </p>
-        </div>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-3xl font-bold">Send SMS Messages</h1>
+        <p className="text-muted-foreground mt-1">
+          Create and send SMS messages using GOV.UK Notify
+        </p>
+      </div>
 
-        {/* Team Selector */}
-        <TeamSelector selectedTeam={activeTeamKey} onTeamChange={setActiveTeamKey}>
-          {(teamKey) => {
-            const team = TEAMS[teamKey]
+      {/* Team Selector */}
+      <TeamSelector selectedTeam={activeTeamKey} onTeamChange={setActiveTeamKey}>
+        {(teamKey) => {
+          const team = TEAMS[teamKey]
 
-            // Editor View
-            if (viewMode === "EDITOR") {
-              return (
-                <MessageEditor
-                  team={team}
-                  example={selectedExample}
-                  onBack={() => setViewMode("SELECTION")}
-                  onSend={handleSendSMS}
-                />
-              )
-            }
+          // Editor View
+          if (viewMode === "EDITOR") {
+            return (
+              <MessageEditor
+                team={team}
+                example={selectedExample}
+                onBack={() => setViewMode("SELECTION")}
+                onSend={handleSendSMS}
+              />
+            )
+          }
 
-            // Bulk Upload View
-            if (viewMode === "BULK") {
-              return (
-                <BulkUpload
-                  team={team}
-                  onBack={() => setViewMode("SELECTION")}
-                />
-              )
-            }
+          // Bulk Upload View
+          if (viewMode === "BULK") {
+            return (
+              <BulkUpload
+                team={team}
+                onBack={() => setViewMode("SELECTION")}
+              />
+            )
+          }
 
-            // History View
-            if (viewMode === "HISTORY") {
-              return (
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle>Message History</CardTitle>
-                        <CardDescription>{team.label}</CardDescription>
-                      </div>
-                      <Button variant="outline" onClick={() => setViewMode("SELECTION")}>
-                        Back
-                      </Button>
+          // History View
+          if (viewMode === "HISTORY") {
+            return (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Message History</CardTitle>
+                      <CardDescription>{team.label}</CardDescription>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    {auditLogs.length === 0 ? (
-                      <p className="text-center text-muted-foreground py-8">
-                        No messages sent yet
-                      </p>
-                    ) : (
-                      <div className="space-y-2">
-                        {auditLogs.slice(0, 20).map((log) => (
-                          <div
-                            key={log.id}
-                            className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"
-                          >
-                            <div className="flex-1">
-                              <p className="text-sm font-medium line-clamp-1">{log.message}</p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {new Date(log.createdAt).toLocaleString()}
-                              </p>
-                            </div>
-                            <Badge
-                              variant={
-                                log.status === "sent"
-                                  ? "success"
-                                  : log.status === "failed"
+                    <Button variant="outline" onClick={() => setViewMode("SELECTION")}>
+                      Back
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {auditLogs.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">
+                      No messages sent yet
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {auditLogs.slice(0, 20).map((log) => (
+                        <div
+                          key={log.id}
+                          className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"
+                        >
+                          <div className="flex-1">
+                            <p className="text-sm font-medium line-clamp-1">{log.message}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {new Date(log.createdAt).toLocaleString()}
+                            </p>
+                          </div>
+                          <Badge
+                            variant={
+                              log.status === "sent"
+                                ? "success"
+                                : log.status === "failed"
                                   ? "destructive"
                                   : "secondary"
-                              }
-                            >
-                              {log.status}
-                            </Badge>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )
-            }
+                            }
+                          >
+                            {log.status}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )
+          }
 
-            // Selection View (Default)
-            return (
-              <div className="space-y-6">
-                {/* Quick Actions */}
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setViewMode("HISTORY")}
-                    className="gap-2"
-                  >
-                    <History className="h-4 w-4" />
-                    View History ({auditLogs.length})
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setViewMode("BULK")}
-                    className="gap-2"
-                  >
-                    <UploadCloud className="h-4 w-4" />
-                    Bulk Send
-                  </Button>
-                </div>
+          // Selection View (Default)
+          return (
+            <div className="space-y-6">
+              {/* Quick Actions */}
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setViewMode("HISTORY")}
+                  className="gap-2"
+                >
+                  <History className="h-4 w-4" />
+                  View History ({auditLogs.length})
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setViewMode("BULK")}
+                  className="gap-2"
+                >
+                  <UploadCloud className="h-4 w-4" />
+                  Bulk Send
+                </Button>
+              </div>
 
-                {/* Templates Grid */}
-                <div>
-                  <h2 className="text-xl font-semibold mb-4">Select a Template</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {/* Example Templates */}
-                    {team.examples?.map((example) => (
-                      <TemplateCard
-                        key={example.label}
-                        title={example.label}
-                        description={team.generateMessage(example.data).substring(0, 100) + "..."}
-                        onClick={() => handleTemplateSelect(example)}
-                      />
-                    ))}
-
-                    {/* Custom Template */}
+              {/* Templates Grid */}
+              <div>
+                <h2 className="text-xl font-semibold mb-4">Select a Template</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Example Templates */}
+                  {team.examples?.map((example) => (
                     <TemplateCard
-                      title="Create Custom"
-                      description="Start from scratch with a blank message"
-                      isCustom
-                      onClick={() => handleTemplateSelect(null)}
+                      key={example.label}
+                      title={example.label}
+                      description={team.generateMessage(example.data).substring(0, 100) + "..."}
+                      onClick={() => handleTemplateSelect(example)}
                     />
-                  </div>
+                  ))}
+
+                  {/* Custom Template */}
+                  <TemplateCard
+                    title="Create Custom"
+                    description="Start from scratch with a blank message"
+                    isCustom
+                    onClick={() => handleTemplateSelect(null)}
+                  />
                 </div>
               </div>
-            )
-          }}
-        </TeamSelector>
-      </div>
-    </DashboardLayout>
+            </div>
+          )
+        }}
+      </TeamSelector>
+    </div>
   )
 }

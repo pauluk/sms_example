@@ -1,12 +1,12 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { NotifyClient } from 'notifications-node-client';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { GLOBAL_TEMPLATE_ID } from '@/config/teams';
 import { db } from '@/lib/db';
-import { smsLog } from '@/lib/schema';
+import { smsLog, systemConfig } from '@/lib/schema';
 import { nanoid } from 'nanoid';
+import { eq } from 'drizzle-orm';
 
 const TEST_PHONE_NUMBER = process.env.TEST_PHONE_NUMBER;
 const NOTIFY_API_KEY = process.env.NOTIFY_API_KEY;
@@ -21,16 +21,28 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { message, scheduledFor, teamId } = await req.json();
+        const { message, scheduledFor, teamId, recipient: reqRecipient } = await req.json();
 
         if (!message) {
             return NextResponse.json({ error: "Message is required" }, { status: 400 });
         }
 
-        // Enforce Test Mode
-        const recipient = TEST_PHONE_NUMBER;
-        if (!recipient) {
-            return NextResponse.json({ error: "Configuration Error: TEST_PHONE_NUMBER not set" }, { status: 500 });
+        // Determine Recipient based on System Configuration
+        const configRecord = await db.select().from(systemConfig).where(eq(systemConfig.key, 'enable_live_sms'));
+        const isLiveMode = configRecord[0]?.value === 'true';
+
+        let recipient = '';
+
+        if (isLiveMode) {
+            if (!reqRecipient) {
+                return NextResponse.json({ error: "Recipient is required in Live Mode" }, { status: 400 });
+            }
+            recipient = reqRecipient;
+        } else {
+            if (!TEST_PHONE_NUMBER) {
+                return NextResponse.json({ error: "Configuration Error: TEST_PHONE_NUMBER not set" }, { status: 500 });
+            }
+            recipient = TEST_PHONE_NUMBER;
         }
 
         const isScheduled = !!scheduledFor;

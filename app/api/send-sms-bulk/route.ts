@@ -4,8 +4,9 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { GLOBAL_TEMPLATE_ID } from '@/config/teams';
 import { db } from '@/lib/db';
-import { smsLog } from '@/lib/schema';
+import { smsLog, systemConfig } from '@/lib/schema';
 import { nanoid } from 'nanoid';
+import { eq } from 'drizzle-orm';
 
 const TEST_PHONE_NUMBER = process.env.TEST_PHONE_NUMBER;
 const NOTIFY_API_KEY = process.env.NOTIFY_API_KEY;
@@ -50,8 +51,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Server Configuration Error: Missing NOTIFY_API_KEY" }, { status: 500 });
     }
 
-    // In test mode, we override the recipient
-    const isTestMode = !!TEST_PHONE_NUMBER;
+    // Check System Configuration for Mode
+    const configRecord = await db.select().from(systemConfig).where(eq(systemConfig.key, 'enable_live_sms'));
+    const isLiveMode = configRecord[0]?.value === 'true';
+    const isTestMode = !isLiveMode;
 
     const notifyClient = new NotifyClient(NOTIFY_API_KEY);
     const results: BulkSMSResult = {

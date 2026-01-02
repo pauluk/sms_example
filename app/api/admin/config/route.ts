@@ -24,9 +24,12 @@ export async function GET(req: NextRequest) {
         }
 
         const config = await db.select().from(systemConfig).where(eq(systemConfig.key, 'allowed_domains'));
-        const value = config[0]?.value || '';
+        const allowedDomains = config[0]?.value || '';
 
-        return NextResponse.json({ allowedDomains: value });
+        const smsConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'enable_live_sms'));
+        const enableLiveSms = smsConfig[0]?.value === 'true';
+
+        return NextResponse.json({ allowedDomains, enableLiveSms });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -43,11 +46,19 @@ export async function PUT(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { allowedDomains } = body;
+        const { allowedDomains, enableLiveSms } = body;
 
-        await db.insert(systemConfig)
-            .values({ key: 'allowed_domains', value: allowedDomains })
-            .onConflictDoUpdate({ target: systemConfig.key, set: { value: allowedDomains, updatedAt: new Date() } });
+        if (allowedDomains !== undefined) {
+            await db.insert(systemConfig)
+                .values({ key: 'allowed_domains', value: allowedDomains })
+                .onConflictDoUpdate({ target: systemConfig.key, set: { value: allowedDomains, updatedAt: new Date() } });
+        }
+
+        if (enableLiveSms !== undefined) {
+            await db.insert(systemConfig)
+                .values({ key: 'enable_live_sms', value: String(enableLiveSms) })
+                .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(enableLiveSms), updatedAt: new Date() } });
+        }
 
         return NextResponse.json({ success: true });
     } catch (error: any) {

@@ -40,12 +40,12 @@ export function Header({ user }: HeaderProps) {
       <div className="container flex h-16 items-center justify-between px-4">
         {/* Logo and Title */}
         <div className="flex items-center gap-6">
-          <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity animate-wavey-fall">
             <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary-foreground text-primary font-bold text-lg">
-              G
+              F
             </div>
             <div className="flex flex-col">
-              <span className="text-lg font-bold leading-none">GOV.UK</span>
+              <span className="text-lg font-bold leading-none">FinOps</span>
               <span className="text-xs leading-none opacity-90">SMS Service</span>
             </div>
           </Link>
@@ -60,12 +60,20 @@ export function Header({ user }: HeaderProps) {
             </Link>
 
             {isAdmin && (
-              <Link href="/dashboard/users">
-                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
-                  <Users className="mr-2 h-4 w-4" />
-                  Users
-                </Button>
-              </Link>
+              <>
+                <Link href="/dashboard/users">
+                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
+                    <Users className="mr-2 h-4 w-4" />
+                    Users
+                  </Button>
+                </Link>
+                <Link href="/dashboard/admin/settings">
+                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">
+                    <Settings className="mr-2 h-4 w-4" />
+                    System
+                  </Button>
+                </Link>
+              </>
             )}
           </nav>
         </div>

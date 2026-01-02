@@ -3,12 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { Save, ShieldAlert, ArrowLeft } from "lucide-react";
+import { Save, ShieldAlert, ArrowLeft, MessageSquare, AlertTriangle } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 
 export default function AdminSettingsPage() {
     const router = useRouter();
     const { data: session } = authClient.useSession();
     const [allowedDomains, setAllowedDomains] = useState("");
+    const [enableLiveSms, setEnableLiveSms] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
@@ -23,8 +26,9 @@ export default function AdminSettingsPage() {
                 return res.json();
             })
             .then((data) => {
-                if (data && data.allowedDomains) {
-                    setAllowedDomains(data.allowedDomains);
+                if (data) {
+                    if (data.allowedDomains) setAllowedDomains(data.allowedDomains);
+                    if (data.enableLiveSms !== undefined) setEnableLiveSms(data.enableLiveSms);
                 }
                 setLoading(false);
             })
@@ -40,7 +44,7 @@ export default function AdminSettingsPage() {
             const res = await fetch("/api/admin/config", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ allowedDomains }),
+                body: JSON.stringify({ allowedDomains, enableLiveSms }),
             });
             if (!res.ok) throw new Error("Failed to save");
             alert("Settings saved successfully");
@@ -88,6 +92,33 @@ export default function AdminSettingsPage() {
                             className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             placeholder="nhsbsa.nhs.uk"
                         />
+                    </div>
+
+                    <div className="mt-8 pt-6 border-t">
+                        <div className="flex items-start gap-4 mb-6">
+                            <div className="p-3 bg-purple-100 text-purple-600 rounded-lg">
+                                <MessageSquare className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold text-gray-900">SMS Configuration</h2>
+                                <p className="text-gray-500">Manage SMS sending behavior.</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div>
+                                <h3 className="font-medium text-gray-900">Enable Live SMS</h3>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    When enabled, real SMS messages will be sent via GOV.UK Notify.
+                                    <br />
+                                    When disabled, messages are only logged (Simulation Mode).
+                                </p>
+                            </div>
+                            <Switch
+                                checked={enableLiveSms}
+                                onCheckedChange={setEnableLiveSms}
+                            />
+                        </div>
                     </div>
 
                     <div className="mt-8 pt-6 border-t flex justify-end">
