@@ -1,26 +1,145 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* GOV.UK inspired color system */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    /* Primary: GOV.UK Blue (#1d70b8) */
+    --primary: 207 69% 42%;
+    --primary-foreground: 0 0% 98%;
+
+    /* Secondary: Light grey */
+    --secondary: 30 11% 95%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    /* Muted: GOV.UK grey */
+    --muted: 30 11% 95%;
+    --muted-foreground: 215 13.8% 34.1%;
+
+    /* Accent: GOV.UK light blue */
+    --accent: 207 69% 85%;
+    --accent-foreground: 207 69% 15%;
+
+    /* Destructive: GOV.UK red (#d4351c) */
+    --destructive: 9 76% 47%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Success: GOV.UK green (#00703c) */
+    --success: 156 100% 22%;
+    --success-foreground: 0 0% 98%;
+
+    /* Warning: GOV.UK yellow (#ffdd00) */
+    --warning: 51 100% 50%;
+    --warning-foreground: 240 10% 3.9%;
+
+    /* Border and input */
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 207 69% 42%;
+
+    /* GOV.UK focus yellow */
+    --focus: 51 100% 50%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Dark mode colors */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Primary: Lighter blue for dark mode */
+    --primary: 207 69% 65%;
+    --primary-foreground: 240 5.9% 10%;
+
+    /* Secondary */
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    /* Muted */
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    /* Accent */
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+
+    /* Destructive: Softer red for dark */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Success: Softer green */
+    --success: 156 50% 35%;
+    --success-foreground: 0 0% 98%;
+
+    /* Warning: Still bright yellow */
+    --warning: 51 100% 50%;
+    --warning-foreground: 240 10% 3.9%;
+
+    /* Border and input */
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 207 69% 65%;
+
+    /* Focus remains yellow */
+    --focus: 51 100% 50%;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* GOV.UK inspired focus states */
+  *:focus-visible {
+    outline: 3px solid hsl(var(--focus));
+    outline-offset: 0;
+  }
+
+  /* GOV.UK typography scale */
+  h1 {
+    @apply text-4xl font-bold tracking-tight;
+  }
+
+  h2 {
+    @apply text-3xl font-semibold tracking-tight;
+  }
+
+  h3 {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+
+  h4 {
+    @apply text-xl font-semibold tracking-tight;
+  }
+
+  h5 {
+    @apply text-lg font-semibold;
+  }
+
+  h6 {
+    @apply text-base font-semibold;
+  }
+}
+
+/* GOV.UK button shadow effect */
+.govuk-button {
+  box-shadow: 0 2px 0 #003078;
+  @apply active:shadow-none active:translate-y-0.5 transition-transform;
 }
