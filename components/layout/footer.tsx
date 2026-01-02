@@ -17,12 +17,6 @@ export function Footer() {
                         <BookOpen className="h-4 w-4" />
                         User Stories
                     </Link>
-                    <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                        Privacy Policy
-                    </Link>
-                    <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                        Terms of Service
-                    </Link>
                 </div>
             </div>
         </footer>
