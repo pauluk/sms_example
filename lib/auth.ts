@@ -31,25 +31,39 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         async sendResetPassword({ url, user }) {
-            await transporter.sendMail({
-                from: process.env.FROM_NAME ? `"${process.env.FROM_NAME}" <${process.env.FROM_EMAIL}>` : process.env.FROM_EMAIL,
-                to: user.email,
-                subject: "Reset your password",
-                text: `Click the link to reset your password: ${url}`,
-                html: `<a href="${url}">Reset your password</a>`,
-            });
+            try {
+                console.log('Attempting to send password reset to:', user.email);
+                const info = await transporter.sendMail({
+                    from: process.env.FROM_NAME ? `"${process.env.FROM_NAME}" <${process.env.FROM_EMAIL}>` : process.env.FROM_EMAIL,
+                    to: user.email,
+                    subject: "Reset your password",
+                    text: `Click the link to reset your password: ${url}`,
+                    html: `<a href="${url}">Reset your password</a>`,
+                });
+                console.log('Password reset email sent successfully:', info.messageId);
+            } catch (error) {
+                console.error('Failed to send password reset email:', error);
+                throw new Error(`Failed to send password reset email: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            }
         },
     },
     plugins: [
         magicLink({
             sendMagicLink: async ({ email, token, url }) => {
-                await transporter.sendMail({
-                    from: process.env.FROM_NAME ? `"${process.env.FROM_NAME}" <${process.env.FROM_EMAIL}>` : process.env.FROM_EMAIL,
-                    to: email,
-                    subject: "Sign in to Gov SMS App",
-                    text: `Click the link to sign in: ${url}`,
-                    html: `<a href="${url}">Sign in to Gov SMS App</a>`,
-                });
+                try {
+                    console.log('Attempting to send magic link to:', email);
+                    const info = await transporter.sendMail({
+                        from: process.env.FROM_NAME ? `"${process.env.FROM_NAME}" <${process.env.FROM_EMAIL}>` : process.env.FROM_EMAIL,
+                        to: email,
+                        subject: "Sign in to Gov SMS App",
+                        text: `Click the link to sign in: ${url}`,
+                        html: `<a href="${url}">Sign in to Gov SMS App</a>`,
+                    });
+                    console.log('Magic link sent successfully:', info.messageId);
+                } catch (error) {
+                    console.error('Failed to send magic link:', error);
+                    throw new Error(`Failed to send magic link: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                }
             }
         }),
         admin(),
