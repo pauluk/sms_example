@@ -1,9 +1,23 @@
+"use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Server, Database, Lock, Globe, Code2, Layout } from "lucide-react";
+import { useEffect } from "react";
+import mermaid from "mermaid";
 
 export default function TechnicalPage() {
+    useEffect(() => {
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        // Small timeout to ensure DOM is ready
+        const timeout = setTimeout(() => {
+            mermaid.run({
+                querySelector: '.mermaid'
+            });
+        }, 100);
+        return () => clearTimeout(timeout);
+    }, []);
+
     return (
         <div className="space-y-8 container mx-auto max-w-5xl">
             <div>
@@ -101,7 +115,7 @@ export default function TechnicalPage() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <pre className="text-xs md:text-sm font-mono bg-black/50 p-4 rounded-lg overflow-x-auto text-green-400">
+                    <pre className="mermaid text-xs md:text-sm font-mono bg-black/50 p-4 rounded-lg overflow-x-auto text-green-400">
                         {`graph TD
     User[Web Browser] -->|HTTPS| CDN[Vercel Edge Network]
     CDN --> Next[Next.js Application]

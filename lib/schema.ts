@@ -102,5 +102,22 @@ export const smsLog = pgTable("sms_log", {
 export const systemConfig = pgTable("system_config", {
     key: text("key").primaryKey(), // e.g., 'allowed_domains'
     value: text("value").notNull(), // e.g., 'nhsbsa.nhs.uk'
+    createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const serviceAssessment = pgTable("service_assessment", {
+    id: text("id").primaryKey(),
+    serviceName: text("service_name"),
+    volumeEmail: integer("volume_email"),
+    volumeSms: integer("volume_sms"),
+    volumeLetter: integer("volume_letter"),
+    isUnique: boolean("is_unique"),
+    hasMinTeam: boolean("has_min_team"),
+    hasTemplates: boolean("has_templates"),
+    fromName: text("from_name"),
+    replyToEmail: text("reply_to_email"),
+    senderId: text("sender_id"),
+    updatedAt: timestamp("updated_at"),
+    updatedBy: text("updated_by"),
 });
