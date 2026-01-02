@@ -6,8 +6,9 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { AlertCircle, BarChart3, TrendingUp } from "lucide-react";
+import { AlertCircle, BarChart3, TrendingUp, Calendar } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 
 export default function UsagePage() {
     const { data: session, isPending } = authClient.useSession();
@@ -57,14 +58,15 @@ export default function UsagePage() {
 
     if (!metrics) return null;
 
-    const percentageUsed = Math.min(100, Math.round((metrics.monthlyUsage / metrics.quota) * 100));
+    const percentageUsed = Math.min(100, Math.round((metrics.used / metrics.quota) * 100));
 
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Usage & Quota</h1>
-                <p className="text-muted-foreground">
-                    Monitor SMS usage and remaining quota for the current month.
+                <h1 className="text-3xl font-bold tracking-tight">Financial Year Usage</h1>
+                <p className="text-muted-foreground flex items-center gap-2 mt-1">
+                    <Calendar className="h-4 w-4" />
+                    April {metrics.financialYear.split('/')[0]} – March {metrics.financialYear.split('/')[1]}
                 </p>
             </div>
 
@@ -72,18 +74,18 @@ export default function UsagePage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Monthly Usage
+                            Annual Usage
                         </CardTitle>
                         <BarChart3 className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{metrics.monthlyUsage.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">{metrics.used.toLocaleString()}</div>
                         <p className="text-xs text-muted-foreground">
-                            messages sent this month
+                            messages sent this year
                         </p>
                         <Progress value={percentageUsed} className="mt-4" />
                         <p className="text-xs text-muted-foreground mt-2">
-                            {percentageUsed}% of quota used
+                            {percentageUsed}% of annual quota used
                         </p>
                     </CardContent>
                 </Card>
@@ -96,12 +98,12 @@ export default function UsagePage() {
                         <AlertCircle className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{metrics.monthlyRemaining.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">{metrics.remaining.toLocaleString()}</div>
                         <p className="text-xs text-muted-foreground">
                             messages available
                         </p>
                         <p className="text-xs text-muted-foreground mt-6">
-                            Total Quota: {metrics.quota.toLocaleString()}
+                            Annual Limit: {metrics.quota.toLocaleString()}
                         </p>
                     </CardContent>
                 </Card>
@@ -109,31 +111,58 @@ export default function UsagePage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Projected Usage
+                            Projected Total
                         </CardTitle>
                         <TrendingUp className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{metrics.estimatedusage.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">{metrics.projectedTotal.toLocaleString()}</div>
                         <p className="text-xs text-muted-foreground">
-                            estimated by month end
+                            forecasted for end of financial year
                         </p>
-                        <p className="text-xs text-muted-foreground mt-6">
-                            Based on current daily average
-                        </p>
+                        <div className={`text-xs mt-6 font-medium ${metrics.projectedTotal > metrics.quota ? "text-red-600" : "text-green-600"}`}>
+                            {metrics.projectedTotal > metrics.quota ?
+                                `⚠️ on track to exceed quota by ${(metrics.projectedTotal - metrics.quota).toLocaleString()}` :
+                                `✅ on track to stay within quota`
+                            }
+                        </div>
                     </CardContent>
                 </Card>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Total Lifetime Usage</CardTitle>
+                    <CardTitle>Usage Forecast (Apr - Mar)</CardTitle>
                     <CardDescription>
-                        Total messages sent since system inception.
+                        Monthly breakdown with future projections based on current average usage.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-4xl font-bold">{metrics.totalSent.toLocaleString()}</div>
+                    <div className="h-[400px] w-full mt-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                                data={metrics.graphData}
+                                margin={{
+                                    top: 20,
+                                    right: 30,
+                                    left: 20,
+                                    bottom: 5,
+                                }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                <XAxis dataKey="name" />
+                                <YAxis />
+                                <Tooltip
+                                    formatter={(value: any, name: any) => [value?.toLocaleString() || "0", name === 'actual' ? 'Actual Sent' : 'Projected']}
+                                    labelStyle={{ color: '#000' }}
+                                />
+                                <Legend />
+                                <Bar dataKey="actual" name="Actual Usage" stackId="a" fill="hsl(var(--primary))" radius={[0, 0, 4, 4]} />
+                                <Bar dataKey="projected" name="Projected" stackId="a" fill="#e5e7eb" radius={[4, 4, 0, 0]} />
+                                {/* Optional: Quota Line? Normalized to monthly? No, quota is annual. */}
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
                 </CardContent>
             </Card>
         </div>

@@ -126,9 +126,9 @@ export default function AdminSettingsPage() {
 
                         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 mt-4">
                             <div>
-                                <h3 className="font-medium text-gray-900">Monthly Usage Quota</h3>
+                                <h3 className="font-medium text-gray-900">Annual Usage Quota</h3>
                                 <p className="text-sm text-gray-500 mt-1">
-                                    Set the monthly limit for SMS messages.
+                                    Set the annual limit for SMS messages (resets April 1st).
                                 </p>
                             </div>
                             <input
