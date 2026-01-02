@@ -9,6 +9,13 @@ A Next.js application with Better Auth, Neon PostgreSQL, and GOV.UK Notify integ
 - **Database**: PostgreSQL hosted on Neon, managed via Drizzle ORM.
 - **Notifications**: Integration with GOV.UK Notify for sending SMS.
 
+## Technology Stack
+
+-   **GOV.UK Notify API**: Used for sending SMS messages.
+-   **Better Auth**: Handles authentication (Email, Passkeys, Magic Links).
+-   **Neon Database (Serverless Postgres)**: Cloud database provider.
+-   **Next.js App Router**: Backend API routes and Frontend React framework.
+
 ## Setup
 
 1.  **Environment Variables**:
