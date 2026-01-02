@@ -7,10 +7,13 @@ interface TeamSelectorProps {
   selectedTeam: string
   onTeamChange: (team: string) => void
   children: (teamKey: string) => React.ReactNode
+  allowedTeams?: string[]
 }
 
-export function TeamSelector({ selectedTeam, onTeamChange, children }: TeamSelectorProps) {
-  const teamKeys = Object.keys(TEAMS)
+export function TeamSelector({ selectedTeam, onTeamChange, children, allowedTeams }: TeamSelectorProps) {
+  const teamKeys = Object.keys(TEAMS).filter(key =>
+    !allowedTeams || allowedTeams.includes(key)
+  )
 
   return (
     <Tabs value={selectedTeam} onValueChange={onTeamChange} className="w-full">

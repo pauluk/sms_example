@@ -119,6 +119,11 @@ export default function Dashboard() {
   const user = session.user as any
   const activeTeam = TEAMS[activeTeamKey]
 
+  // Calculate allowed teams
+  const allowedTeams = user.role === 'admin'
+    ? undefined
+    : (user.teamId ? [user.teamId] : [])
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -130,7 +135,11 @@ export default function Dashboard() {
       </div>
 
       {/* Team Selector */}
-      <TeamSelector selectedTeam={activeTeamKey} onTeamChange={setActiveTeamKey}>
+      <TeamSelector
+        selectedTeam={activeTeamKey}
+        onTeamChange={setActiveTeamKey}
+        allowedTeams={allowedTeams}
+      >
         {(teamKey) => {
           const team = TEAMS[teamKey]
 
