@@ -105,6 +105,14 @@ const USER_STORIES = [
         story: "I want to search for a mobile number to see an audit trail of messages sent, and export the result as PDF/TXT.",
         status: "Completed",
         priority: "High"
+    },
+    {
+        id: "US-012",
+        role: "Admin",
+        feature: "GDPR Access Control",
+        story: "I want to assign a restricted 'GDPR' role to users so they can only access the GDPR dashboard for compliance audits.",
+        status: "Completed",
+        priority: "High"
     }
 ];
 
