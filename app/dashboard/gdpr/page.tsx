@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Loader2, FileCheck, AlertCircle } from "lucide-react";
+import { Search, Loader2, FileCheck, AlertCircle, FileText, Download } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { TEAMS } from "@/config/teams";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default function GDPRPage() {
     const [mobile, setMobile] = useState("");
@@ -42,6 +44,115 @@ export default function GDPRPage() {
         }
     };
 
+    const handleExportPDF = () => {
+        const doc = new jsPDF();
+
+        // Header
+        doc.setFontSize(20);
+        doc.setTextColor(40, 40, 40);
+        doc.text("GDPR SMS Audit Report", 14, 22);
+
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+        doc.text(`Mobile Number: ${mobile}`, 14, 35);
+
+        if (!results || results.length === 0) {
+            // Nil Return
+            doc.setFillColor(240, 253, 244); // green-50
+            doc.rect(14, 45, 182, 30, 'F');
+            doc.setDrawColor(34, 197, 94); // green-500
+            doc.setLineWidth(1);
+            doc.line(14, 45, 14, 75); // Left border
+
+            doc.setFontSize(14);
+            doc.setTextColor(21, 128, 61); // green-700
+            doc.text("Nil Return Report", 20, 58);
+
+            doc.setFontSize(10);
+            doc.setTextColor(80);
+            doc.text(`No records found for ${mobile}. This mobile number is not present in the SMS logs.`, 20, 66);
+        } else {
+            // Data Table
+            doc.setFillColor(254, 252, 232); // yellow-50
+            doc.rect(14, 45, 182, 30, 'F');
+            doc.setDrawColor(234, 179, 8); // yellow-500
+            doc.setLineWidth(1);
+            doc.line(14, 45, 14, 75);
+
+            doc.setFontSize(14);
+            doc.setTextColor(161, 98, 7); // yellow-700
+            doc.text("Data Found", 20, 58);
+            doc.setFontSize(10);
+            doc.setTextColor(80);
+            doc.text(`Found ${results.length} record(s) for ${mobile}.`, 20, 66);
+
+            const tableData = results.map(log => [
+                new Date(log.sentAt || log.createdAt).toLocaleString(),
+                TEAMS[log.teamId as keyof typeof TEAMS]?.label || log.teamId,
+                `${log.userName || "Unknown"} (${log.userEmail || ""})`,
+                log.status,
+                log.message
+            ]);
+
+            autoTable(doc, {
+                startY: 85,
+                head: [['Date & Time', 'Team', 'Sent By', 'Status', 'Message']],
+                body: tableData,
+                theme: 'grid',
+                styles: { fontSize: 8 },
+                headStyles: { fillColor: [66, 66, 66] }
+            });
+        }
+
+        // Footer
+        const pageCount = doc.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(150);
+            doc.text(`Page ${i} of ${pageCount}`, 196, 285, { align: 'right' });
+            doc.text("Fin Ops SMS Application - Official Sensitive", 14, 285);
+        }
+
+        doc.save(`GDPR_Report_${mobile.replace(/\+/g, '')}_${new Date().toISOString().split('T')[0]}.pdf`);
+    };
+
+    const handleExportTXT = () => {
+        let content = `GDPR SMS AUDIT REPORT\n`;
+        content += `=====================\n`;
+        content += `Generated: ${new Date().toLocaleString()}\n`;
+        content += `Mobile Number: ${mobile}\n\n`;
+
+        if (!results || results.length === 0) {
+            content += `RESULT: NIL RETURN / CLEAN\n`;
+            content += `No records found for ${mobile}.\n`;
+        } else {
+            content += `RESULT: DATA FOUND (${results.length} records)\n\n`;
+            content += `AUDIT TRAIL:\n`;
+            content += `----------------------------------------\n`;
+
+            results.forEach((log, index) => {
+                content += `RECORD #${index + 1}\n`;
+                content += `Date: ${new Date(log.sentAt || log.createdAt).toLocaleString()}\n`;
+                content += `Team: ${TEAMS[log.teamId as keyof typeof TEAMS]?.label || log.teamId}\n`;
+                content += `Sent By: ${log.userName || "Unknown"} (${log.userEmail || ""})\n`;
+                content += `Status: ${log.status}\n`;
+                content += `Message: ${log.message}\n`;
+                content += `----------------------------------------\n`;
+            });
+        }
+
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `GDPR_Report_${mobile.replace(/\+/g, '')}_${new Date().toISOString().split('T')[0]}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    };
     return (
         <div className="space-y-8 max-w-5xl mx-auto">
             <div>
@@ -109,6 +220,17 @@ export default function GDPRPage() {
                                     Clean
                                 </Badge>
                             )}
+
+                            <div className="flex gap-2 ml-auto">
+                                <Button variant="outline" size="sm" onClick={handleExportPDF}>
+                                    <FileText className="mr-2 h-4 w-4" />
+                                    PDF
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={handleExportTXT}>
+                                    <Download className="mr-2 h-4 w-4" />
+                                    TXT
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
 

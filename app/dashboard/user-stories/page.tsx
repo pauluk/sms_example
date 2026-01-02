@@ -97,6 +97,14 @@ const USER_STORIES = [
         story: "I want to toggle whether regular users can see this User Stories page.",
         status: "Completed",
         priority: "Low"
+    },
+    {
+        id: "US-011",
+        role: "Admin",
+        feature: "GDPR Search",
+        story: "I want to search for a mobile number to see an audit trail of messages sent, and export the result as PDF/TXT.",
+        status: "Completed",
+        priority: "High"
     }
 ];
 
