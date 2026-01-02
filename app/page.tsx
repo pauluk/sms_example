@@ -95,7 +95,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <h1 className="text-4xl font-bold mb-8">Gov SMS Application</h1>
+      <h1 className="text-4xl font-bold mb-8">Fin Ops SMS Application</h1>
       <div className="w-full max-w-md p-8 space-y-4 bg-white rounded-xl shadow-lg border border-gray-200 text-gray-900">
         {/* ... headers ... */}
         <h2 className="text-2xl font-bold text-center">
