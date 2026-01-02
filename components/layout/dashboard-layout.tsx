@@ -21,7 +21,7 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
       <main className="container mx-auto px-4 py-6 flex-1">
         {children}
       </main>
-      <Footer />
+      <Footer user={user} />
     </div>
   )
 }

@@ -5,9 +5,19 @@ import { Badge } from "@/components/ui/badge";
 import { Server, Database, Lock, Globe, Code2, Layout } from "lucide-react";
 import { useEffect } from "react";
 import mermaid from "mermaid";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function TechnicalPage() {
+    const { data: session, isPending } = authClient.useSession();
+    const router = useRouter();
+
     useEffect(() => {
+        if (!isPending && (!session || session.user.role !== 'admin')) {
+            router.push("/dashboard");
+            return;
+        }
+
         mermaid.initialize({ startOnLoad: false, theme: 'dark' });
         // Small timeout to ensure DOM is ready
         const timeout = setTimeout(() => {
@@ -16,7 +26,11 @@ export default function TechnicalPage() {
             });
         }, 100);
         return () => clearTimeout(timeout);
-    }, []);
+    }, [session, isPending, router]);
+
+    if (isPending || !session || session.user.role !== 'admin') {
+        return <div className="p-8 text-center text-muted-foreground">Checking permissions...</div>;
+    }
 
     return (
         <div className="space-y-8 container mx-auto max-w-5xl">
