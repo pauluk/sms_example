@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gov SMS Web App
 
-## Getting Started
+A Next.js application with Better Auth, Neon PostgreSQL, and GOV.UK Notify integration.
 
-First, run the development server:
+## Features
+
+- **Authentication**: Secure login and signup using Better Auth.
+- **Admin System**: The first user to sign up is automatically assigned the role of `admin`.
+- **Database**: PostgreSQL hosted on Neon, managed via Drizzle ORM.
+- **Notifications**: Integration with GOV.UK Notify for sending SMS.
+
+## Setup
+
+1.  **Environment Variables**:
+    Ensure your `.env` file is set up (created automatically during setup):
+    ```env
+    DATABASE_URL="postgresql://..."
+    BETTER_AUTH_SECRET="..."
+    BETTER_AUTH_URL="http://localhost:3000"
+    NOTIFY_API_KEY="..."
+    SMTP_... (Email settings)
+    ```
+
+2.  **Install Dependencies**:
+    ```bash
+    npm install
+    ```
+
+3.  **Database Migration**:
+    If you need to push schema changes:
+    ```bash
+    npx drizzle-kit push --config=drizzle.config.ts
+    ```
+
+## Running the App
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+-   `app/`: Next.js App Router pages and API routes.
+-   `lib/`: Shared utilities (Auth, DB, Schema).
+-   `drizzle/`: Database migration artifacts.
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+### 1. Push to GitHub
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1.  Create a new repository on GitHub (e.g., `gov-sms-app`).
+2.  Push your code:
+    ```bash
+    git remote add origin https://github.com/YOUR_USERNAME/gov-sms-app.git
+    git branch -M main
+    git push -u origin main
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 2. Deploy to Vercel
 
-## Deploy on Vercel
+1.  Go to [Vercel Dashboard](https://vercel.com/dashboard) and click **"Add New..." -> "Project"**.
+2.  Import your `gov-sms-app` repository.
+3.  In the **Environment Variables** section, add:
+    *   `DATABASE_URL`: Connection string from Neon Console.
+    *   `BETTER_AUTH_SECRET`: Generate one (or use existing).
+    *   `BETTER_AUTH_URL`: Set to your Vercel URL (e.g., `https://your-app.vercel.app`).
+    *   `NOTIFY_API_KEY`: Your GOV.UK Notify Key.
+    *   `SMTP_SERVER`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`: For email sending.
+4.  Click **Deploy**.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 3. Post-Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  **Database Migration**: Vercel usually doesn't run migrations automatically. You can run them locally against the prod DB:
+    ```bash
+    # Update .env to point to PROD database, then:
+    npx drizzle-kit push
+    ```
+    OR add a build command in `package.json` to run migrations (advanced).
+
+2.  **Add Domain**:
+    *   Go to Vercel Project Settings -> Domains.
+    *   Add your custom domain (e.g., `sms.nhsbsa.nhs.uk`).
+
