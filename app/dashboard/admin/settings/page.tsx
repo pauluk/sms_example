@@ -1,11 +1,12 @@
-
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-import { Save, ShieldAlert, ArrowLeft, MessageSquare, AlertTriangle } from "lucide-react";
+import { Save, ShieldAlert, ArrowLeft, MessageSquare, AlertTriangle, ShieldCheck } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export default function AdminSettingsPage() {
     const router = useRouter();
@@ -96,6 +97,18 @@ export default function AdminSettingsPage() {
                         <div>
                             <h2 className="text-xl font-bold text-gray-900">Domain Restriction</h2>
                             <p className="text-gray-500">Control who can sign up to the platform.</p>
+                            <div className="bg-white p-6 rounded-lg border shadow-sm">
+                                <h2 className="text-lg font-semibold mb-4 text-gray-900">Security</h2>
+                                <p className="text-sm text-gray-500 mb-4">
+                                    Audit system dependencies and check for vulnerabilities.
+                                </p>
+                                <Link href="/dashboard/admin/security">
+                                    <Button variant="outline" className="w-full justify-start">
+                                        <ShieldCheck className="mr-2 h-4 w-4" />
+                                        Run Security Audit
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
                     </div>
 

@@ -42,6 +42,18 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "Mobile number is required" }, { status: 400 });
         }
 
+        // Sanitize: Remove spaces and non-numeric chars (keeping + if needed, but for "last 10 digits" we mostly care about digits)
+        const cleanedMobile = mobile.replace(/\s+/g, '');
+
+        // Logic: specific request "look for the last 10 digits"
+        // We will strip everything except digits first to be safe, then take last 10.
+        const digitsOnly = cleanedMobile.replace(/\D/g, '');
+        const searchTerm = digitsOnly.slice(-10);
+
+        if (searchTerm.length < 5) {
+            return NextResponse.json({ error: "Search term too short (min 5 digits)" }, { status: 400 });
+        }
+
         // Perform search
         const logs = await db.select({
             id: smsLog.id,
@@ -55,7 +67,7 @@ export async function GET(req: NextRequest) {
         })
             .from(smsLog)
             .leftJoin(user, eq(smsLog.userId, user.id))
-            .where(like(smsLog.recipient, `%${mobile}%`))
+            .where(like(smsLog.recipient, `%${searchTerm}%`))
             .orderBy(desc(smsLog.sentAt));
 
         return NextResponse.json({ logs });

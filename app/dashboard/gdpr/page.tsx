@@ -55,7 +55,8 @@ export default function GDPRPage() {
         doc.setFontSize(10);
         doc.setTextColor(100);
         doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
-        doc.text(`Mobile Number: ${mobile}`, 14, 35);
+        doc.text(`Mobile Number: ${mobile.replace(/\s/g, '')} (Last 10 digits matched)`, 14, 35);
+
 
         if (!results || results.length === 0) {
             // Nil Return
@@ -122,7 +123,7 @@ export default function GDPRPage() {
         let content = `GDPR SMS AUDIT REPORT\n`;
         content += `=====================\n`;
         content += `Generated: ${new Date().toLocaleString()}\n`;
-        content += `Mobile Number: ${mobile}\n\n`;
+        content += `Mobile Number: ${mobile.replace(/\s/g, '')} (Last 10 digits matched)\n\n`;
 
         if (!results || results.length === 0) {
             content += `RESULT: NIL RETURN / CLEAN\n`;
