@@ -35,7 +35,10 @@ export async function GET(req: NextRequest) {
         const visibilityConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'show_usage_to_teams'));
         const showUsageToTeams = visibilityConfig[0]?.value === 'true';
 
-        return NextResponse.json({ allowedDomains, enableLiveSms, smsQuota, showUsageToTeams });
+        const storiesConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'show_user_stories_to_teams'));
+        const showUserStoriesToTeams = storiesConfig[0]?.value === 'true';
+
+        return NextResponse.json({ allowedDomains, enableLiveSms, smsQuota, showUsageToTeams, showUserStoriesToTeams });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -52,7 +55,7 @@ export async function PUT(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { allowedDomains, enableLiveSms, smsQuota, showUsageToTeams } = body;
+        const { allowedDomains, enableLiveSms, smsQuota, showUsageToTeams, showUserStoriesToTeams } = body;
 
         if (allowedDomains !== undefined) {
             await db.insert(systemConfig)
@@ -76,6 +79,12 @@ export async function PUT(req: NextRequest) {
             await db.insert(systemConfig)
                 .values({ key: 'show_usage_to_teams', value: String(showUsageToTeams) })
                 .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(showUsageToTeams), updatedAt: new Date() } });
+        }
+
+        if (showUserStoriesToTeams !== undefined) {
+            await db.insert(systemConfig)
+                .values({ key: 'show_user_stories_to_teams', value: String(showUserStoriesToTeams) })
+                .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(showUserStoriesToTeams), updatedAt: new Date() } });
         }
 
         return NextResponse.json({ success: true });

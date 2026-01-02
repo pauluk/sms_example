@@ -9,7 +9,13 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle2, CircleDashed } from "lucide-react"
+import { CheckCircle2, CircleDashed, ShieldAlert } from "lucide-react"
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import { db } from '@/lib/db';
+import { systemConfig } from '@/lib/schema';
+import { eq } from 'drizzle-orm';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const USER_STORIES = [
     {
@@ -83,10 +89,53 @@ const USER_STORIES = [
         story: "I want to toggle whether regular users can see the Usage page.",
         status: "Completed",
         priority: "Low"
+    },
+    {
+        id: "US-010",
+        role: "Admin",
+        feature: "User Stories Visibility",
+        story: "I want to toggle whether regular users can see this User Stories page.",
+        status: "Completed",
+        priority: "Low"
     }
 ];
 
-export default function UserStoriesPage() {
+export default async function UserStoriesPage() {
+    // Permission Check
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session) {
+        return (
+            <Alert variant="destructive">
+                <ShieldAlert className="h-4 w-4" />
+                <AlertTitle>Access Denied</AlertTitle>
+                <AlertDescription>You must be logged in to view this page.</AlertDescription>
+            </Alert>
+        )
+    }
+
+    const visibilityConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'show_user_stories_to_teams'));
+    const showUserStoriesToTeams = visibilityConfig[0]?.value === 'true';
+
+    const isAdmin = session.user.role === 'admin';
+
+    if (!isAdmin && !showUserStoriesToTeams) {
+        return (
+            <div className="p-8">
+                <Alert variant="destructive">
+                    <ShieldAlert className="h-4 w-4" />
+                    <AlertTitle>Access Denied</AlertTitle>
+                    <AlertDescription>
+                        You do not have permission to view the User Stories page.
+                        Please contact an administrator if you believe this is an error.
+                    </AlertDescription>
+                </Alert>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6">
             <div>

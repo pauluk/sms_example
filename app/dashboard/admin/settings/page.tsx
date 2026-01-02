@@ -14,6 +14,7 @@ export default function AdminSettingsPage() {
     const [enableLiveSms, setEnableLiveSms] = useState(false);
     const [smsQuota, setSmsQuota] = useState(30000);
     const [showUsageToTeams, setShowUsageToTeams] = useState(false);
+    const [showUserStoriesToTeams, setShowUserStoriesToTeams] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
@@ -33,6 +34,7 @@ export default function AdminSettingsPage() {
                     if (data.enableLiveSms !== undefined) setEnableLiveSms(data.enableLiveSms);
                     if (data.smsQuota !== undefined) setSmsQuota(data.smsQuota);
                     if (data.showUsageToTeams !== undefined) setShowUsageToTeams(data.showUsageToTeams);
+                    if (data.showUserStoriesToTeams !== undefined) setShowUserStoriesToTeams(data.showUserStoriesToTeams);
                 }
                 setLoading(false);
             })
@@ -48,7 +50,7 @@ export default function AdminSettingsPage() {
             const res = await fetch("/api/admin/config", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ allowedDomains, enableLiveSms, smsQuota, showUsageToTeams }),
+                body: JSON.stringify({ allowedDomains, enableLiveSms, smsQuota, showUsageToTeams, showUserStoriesToTeams }),
             });
             if (!res.ok) throw new Error("Failed to save");
             alert("Settings saved successfully");
@@ -149,6 +151,19 @@ export default function AdminSettingsPage() {
                             <Switch
                                 checked={showUsageToTeams}
                                 onCheckedChange={setShowUsageToTeams}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 mt-4">
+                            <div>
+                                <h3 className="font-medium text-gray-900">Show User Stories to Teams</h3>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    If enabled, non-admin users can see the User Stories page.
+                                </p>
+                            </div>
+                            <Switch
+                                checked={showUserStoriesToTeams}
+                                onCheckedChange={setShowUserStoriesToTeams}
                             />
                         </div>
                     </div>
