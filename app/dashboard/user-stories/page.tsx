@@ -136,8 +136,9 @@ export default async function UserStoriesPage() {
     const showUserStoriesToTeams = visibilityConfig[0]?.value === 'true';
 
     const isAdmin = session.user.role === 'admin';
+    const isGDPR = session.user.role === 'gdpr';
 
-    if (!isAdmin && !showUserStoriesToTeams) {
+    if (isGDPR || (!isAdmin && !showUserStoriesToTeams)) {
         return (
             <div className="p-8">
                 <Alert variant="destructive">
