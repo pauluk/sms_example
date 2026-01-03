@@ -55,11 +55,16 @@ export async function GET(req: NextRequest) {
             showUserStoriesToTeams,
             maintenanceMode,
             showGdprToAdmin,
-
             showGdprToTeams,
             supportEmail: (await db.select().from(systemConfig).where(eq(systemConfig.key, 'support_email')))[0]?.value || '',
-            rateLimitPerHour: parseInt((await db.select().from(systemConfig).where(eq(systemConfig.key, 'rate_limit_per_hour')))[0]?.value || '100')
+            rateLimitPerHour: parseInt((await db.select().from(systemConfig).where(eq(systemConfig.key, 'rate_limit_per_hour')))[0]?.value || '100'),
+            smsCompressorProvider: (await db.select().from(systemConfig).where(eq(systemConfig.key, 'smsCompressorProvider')))[0]?.value || 'risen',
+            smsCompressorMaxChars: parseInt((await db.select().from(systemConfig).where(eq(systemConfig.key, 'smsCompressorMaxChars')))[0]?.value || '160'),
+            enableManualCompressor: (await db.select().from(systemConfig).where(eq(systemConfig.key, 'enableManualCompressor')))[0]?.value !== 'false',
+            enableGeminiCompressor: (await db.select().from(systemConfig).where(eq(systemConfig.key, 'enableGeminiCompressor')))[0]?.value !== 'false',
+            showSmsCompressorLink: (await db.select().from(systemConfig).where(eq(systemConfig.key, 'showSmsCompressorLink')))[0]?.value !== 'false',
         });
+
     } catch (error: any) {
         console.error("Admin Config GET Error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -86,7 +91,12 @@ export async function PUT(req: NextRequest) {
             maintenanceMode,
             showGdprToAdmin,
             showGdprToTeams,
-            rateLimitPerHour
+            rateLimitPerHour,
+            smsCompressorProvider,
+            smsCompressorMaxChars,
+            enableManualCompressor,
+            enableGeminiCompressor,
+            showSmsCompressorLink
         } = body;
 
         if (allowedDomains !== undefined) {
@@ -146,6 +156,36 @@ export async function PUT(req: NextRequest) {
             await db.insert(systemConfig)
                 .values({ key: 'rate_limit_per_hour', value: String(rateLimitPerHour) })
                 .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(rateLimitPerHour), updatedAt: new Date() } });
+        }
+
+        if (smsCompressorProvider !== undefined) {
+            await db.insert(systemConfig)
+                .values({ key: 'smsCompressorProvider', value: String(smsCompressorProvider) })
+                .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(smsCompressorProvider), updatedAt: new Date() } });
+        }
+
+        if (smsCompressorMaxChars !== undefined) {
+            await db.insert(systemConfig)
+                .values({ key: 'smsCompressorMaxChars', value: String(smsCompressorMaxChars) })
+                .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(smsCompressorMaxChars), updatedAt: new Date() } });
+        }
+
+        if (enableManualCompressor !== undefined) {
+            await db.insert(systemConfig)
+                .values({ key: 'enableManualCompressor', value: String(enableManualCompressor) })
+                .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(enableManualCompressor), updatedAt: new Date() } });
+        }
+
+        if (enableGeminiCompressor !== undefined) {
+            await db.insert(systemConfig)
+                .values({ key: 'enableGeminiCompressor', value: String(enableGeminiCompressor) })
+                .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(enableGeminiCompressor), updatedAt: new Date() } });
+        }
+
+        if (showSmsCompressorLink !== undefined) {
+            await db.insert(systemConfig)
+                .values({ key: 'showSmsCompressorLink', value: String(showSmsCompressorLink) })
+                .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(showSmsCompressorLink), updatedAt: new Date() } });
         }
 
         return NextResponse.json({ success: true });
