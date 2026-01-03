@@ -19,6 +19,12 @@ export function Footer({ user }: { user?: { role?: string } | null }) {
                         <BookOpen className="h-4 w-4" />
                         User Stories
                     </Link>
+                    <Link
+                        href="/benefits"
+                        className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                    >
+                        Calculator
+                    </Link>
                     {isAdmin && (
                         <>
                             <Link href="/dashboard/admin/go-live" className="text-muted-foreground hover:text-primary transition-colors">
