@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-import { Save, ShieldAlert, ArrowLeft, MessageSquare, AlertTriangle, ShieldCheck } from "lucide-react";
+import { Save, ShieldAlert, ArrowLeft, MessageSquare, AlertTriangle, ShieldCheck, Sparkles, Wand2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,8 @@ export default function AdminSettingsPage() {
     const [rateLimitPerHour, setRateLimitPerHour] = useState(100);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [smsCompressorProvider, setSmsCompressorProvider] = useState<"risen" | "gemini">("risen");
+    const [smsCompressorMaxChars, setSmsCompressorMaxChars] = useState<160 | 370>(160);
 
     useEffect(() => {
         fetch("/api/admin/config")
@@ -43,10 +45,11 @@ export default function AdminSettingsPage() {
                     if (data.showUserStoriesToTeams !== undefined) setShowUserStoriesToTeams(data.showUserStoriesToTeams);
                     if (data.maintenanceMode !== undefined) setMaintenanceMode(data.maintenanceMode);
                     if (data.showGdprToAdmin !== undefined) setShowGdprToAdmin(data.showGdprToAdmin);
-                    if (data.showGdprToAdmin !== undefined) setShowGdprToAdmin(data.showGdprToAdmin);
                     if (data.showGdprToTeams !== undefined) setShowGdprToTeams(data.showGdprToTeams);
                     if (data.supportEmail) setSupportEmail(data.supportEmail);
                     if (data.rateLimitPerHour !== undefined) setRateLimitPerHour(data.rateLimitPerHour);
+                    if (data.smsCompressorProvider) setSmsCompressorProvider(data.smsCompressorProvider);
+                    if (data.smsCompressorMaxChars) setSmsCompressorMaxChars(data.smsCompressorMaxChars);
                 }
                 setLoading(false);
             })
@@ -72,7 +75,9 @@ export default function AdminSettingsPage() {
                     showGdprToAdmin,
                     showGdprToTeams,
                     supportEmail,
-                    rateLimitPerHour
+                    rateLimitPerHour,
+                    smsCompressorProvider,
+                    smsCompressorMaxChars
                 }),
             });
             if (!res.ok) throw new Error("Failed to save");
@@ -144,6 +149,18 @@ export default function AdminSettingsPage() {
                                     <div className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                                         <h3 className="font-semibold text-gray-900 mb-1">GDPR Playground</h3>
                                         <p className="text-sm text-gray-500">Test GDPR Search & Compliance tools.</p>
+                                    </div>
+                                </Link>
+                                <Link href="/sms-compressor" className="block">
+                                    <div className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                                        <h3 className="font-semibold text-gray-900 mb-1">SMS Compressor</h3>
+                                        <p className="text-sm text-gray-500">AI-powered message condenser (RISEN/Gemini).</p>
+                                    </div>
+                                </Link>
+                                <Link href="/sms-compressor" className="block">
+                                    <div className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                                        <h3 className="font-semibold text-gray-900 mb-1">SMS Compressor</h3>
+                                        <p className="text-sm text-gray-500">AI-powered message condenser (RISEN/Gemini).</p>
                                     </div>
                                 </Link>
                             </div>
@@ -309,6 +326,92 @@ export default function AdminSettingsPage() {
                                 checked={showGdprToTeams}
                                 onCheckedChange={setShowGdprToTeams}
                             />
+                        </div>
+                    </div>
+
+                    <div className="mt-8 pt-6 border-t">
+                        <div className="flex items-start gap-4 mb-6">
+                            <div className="p-3 bg-amber-100 text-amber-600 rounded-lg">
+                                <Sparkles className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold text-gray-900">SMS Compressor Tool</h2>
+                                <p className="text-gray-500">Configure the AI tool used for condensing messages.</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <h3 className="font-medium text-gray-900 mb-4">AI Provider</h3>
+                                <div className="space-y-3">
+                                    <label className="flex items-center gap-3 p-3 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                                        <input
+                                            type="radio"
+                                            name="provider"
+                                            value="risen"
+                                            checked={smsCompressorProvider === "risen"}
+                                            onChange={(e) => setSmsCompressorProvider("risen")}
+                                            className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                        />
+                                        <div>
+                                            <div className="font-medium text-gray-900">RISEN Prompt Generator</div>
+                                            <div className="text-sm text-gray-500">Generates engineered prompts for use with any LLM (Manual).</div>
+                                        </div>
+                                    </label>
+                                    <label className="flex items-center gap-3 p-3 bg-white border rounded-lg cursor-not-allowed opacity-60">
+                                        <input
+                                            type="radio"
+                                            name="provider"
+                                            value="gemini"
+                                            disabled
+                                            checked={smsCompressorProvider === "gemini"}
+                                            onChange={(e) => setSmsCompressorProvider("gemini")}
+                                            className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                        />
+                                        <div>
+                                            <div className="font-medium text-gray-900 flex items-center gap-2">
+                                                Gemini 1.5 Flash API
+                                                <Badge variant="secondary" className="text-xs">Coming Soon</Badge>
+                                            </div>
+                                            <div className="text-sm text-gray-500">Automated compression via Google Gemini API.</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <h3 className="font-medium text-gray-900 mb-4">Target Length</h3>
+                                <div className="flex gap-4">
+                                    <label className={`flex-1 p-3 bg-white border rounded-lg cursor-pointer transition-colors ${smsCompressorMaxChars === 160 ? 'ring-2 ring-blue-500 border-transparent' : 'hover:border-blue-300'}`}>
+                                        <input
+                                            type="radio"
+                                            name="chars"
+                                            value={160}
+                                            checked={smsCompressorMaxChars === 160}
+                                            onChange={() => setSmsCompressorMaxChars(160)}
+                                            className="sr-only"
+                                        />
+                                        <div className="text-center">
+                                            <div className="font-bold text-2xl text-gray-900">160</div>
+                                            <div className="text-sm text-gray-500">Characters (1 SMS)</div>
+                                        </div>
+                                    </label>
+                                    <label className={`flex-1 p-3 bg-white border rounded-lg cursor-pointer transition-colors ${smsCompressorMaxChars === 370 ? 'ring-2 ring-blue-500 border-transparent' : 'hover:border-blue-300'}`}>
+                                        <input
+                                            type="radio"
+                                            name="chars"
+                                            value={370}
+                                            checked={smsCompressorMaxChars === 370}
+                                            onChange={() => setSmsCompressorMaxChars(370)}
+                                            className="sr-only"
+                                        />
+                                        <div className="text-center">
+                                            <div className="font-bold text-2xl text-gray-900">370</div>
+                                            <div className="text-sm text-gray-500">Characters (2 SMS)</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

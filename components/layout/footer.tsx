@@ -25,6 +25,12 @@ export function Footer({ user }: { user?: { role?: string } | null }) {
                     >
                         Calculator
                     </Link>
+                    <Link
+                        href="/sms-compressor"
+                        className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                    >
+                        Compressor
+                    </Link>
                     {isAdmin && (
                         <>
                             <Link href="/dashboard/admin/go-live" className="text-muted-foreground hover:text-primary transition-colors">

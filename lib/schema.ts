@@ -1,5 +1,28 @@
-
 import { boolean, pgTable, text, timestamp, integer } from "drizzle-orm/pg-core";
+
+export interface SystemConfig {
+    maintenanceMode: boolean;
+    environmentId: string;
+    logLevel: 'info' | 'warn' | 'error' | 'debug';
+    maxRetries: number;
+    enableAuditLogging: boolean;
+    show_gdpr_to_teams: boolean;
+    smsCompressorProvider: 'risen' | 'gemini';
+    smsCompressorMaxChars: 160 | 370;
+    geminiApiKey: string;
+}
+
+export const DEFAULT_SYSTEM_CONFIG: SystemConfig = {
+    maintenanceMode: false,
+    environmentId: 'development',
+    logLevel: 'info',
+    maxRetries: 3,
+    enableAuditLogging: true,
+    show_gdpr_to_teams: false,
+    smsCompressorProvider: 'risen',
+    smsCompressorMaxChars: 160,
+    geminiApiKey: '',
+};
 
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
