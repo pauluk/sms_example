@@ -23,21 +23,11 @@ export async function middleware(request: NextRequest) {
         const configRes = await fetch(sysConfigUrl);
         const { maintenanceMode } = await configRes.json();
 
+        // 3. Maintenance check
         if (maintenanceMode) {
-            // 3. If Maintenance is ON, we need to check if user is Admin.
-            // Accessing DB directly here is risky/hard in edge.
-            // We can check the session cookie exists, but validating role requires a fetch to /api/auth/get-session 
-            // OR simpler:
-            // If we just block everyone from /dashboard when maintenance is on, except those with a special cookie? No.
-            // We generally want Admins to be able to access.
-
-            // Better Auth doesn't have a simple synchronous middleware check without DB.
-            // We can use 'better-auth/middleware' if we were using the plugin, but we're manual here.
-
-            // Strategy:
+            // Check if session is admin
             // Fetch session from Better Auth API
             const sessionUrl = new URL('/api/auth/get-session', request.url);
-            // We need to pass the cookie header
             const sessionRes = await fetch(sessionUrl, {
                 headers: {
                     cookie: request.headers.get('cookie') || ''
@@ -48,10 +38,29 @@ export async function middleware(request: NextRequest) {
             if (!session || session.user.role !== 'admin') {
                 return NextResponse.redirect(new URL('/maintenance', request.url));
             }
+        } else {
+            // 4. Role-based Access Control (GDPR)
+            // We need to check session for GDPR users accessing non-GDPR dashboard routes
+            if (pathname.startsWith('/dashboard')) {
+                const sessionUrl = new URL('/api/auth/get-session', request.url);
+                const sessionRes = await fetch(sessionUrl, {
+                    headers: {
+                        cookie: request.headers.get('cookie') || ''
+                    }
+                });
+                const session = await sessionRes.json();
+
+                if (session && session.user.role === 'gdpr') {
+                    // Allow only /dashboard/gdpr
+                    if (!pathname.startsWith('/dashboard/gdpr')) {
+                        return NextResponse.redirect(new URL('/dashboard/gdpr', request.url));
+                    }
+                }
+            }
         }
+
     } catch (error) {
         console.error("Middleware error:", error);
-        // Fail open or closed? Fail open to avoid blocking due to error options.
     }
 
     return NextResponse.next();
