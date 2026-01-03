@@ -61,7 +61,8 @@ export async function GET(req: NextRequest) {
             rateLimitPerHour: parseInt((await db.select().from(systemConfig).where(eq(systemConfig.key, 'rate_limit_per_hour')))[0]?.value || '100')
         });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error("Admin Config GET Error:", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
 
@@ -149,6 +150,7 @@ export async function PUT(req: NextRequest) {
 
         return NextResponse.json({ success: true });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error("Admin Config PUT Error:", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
