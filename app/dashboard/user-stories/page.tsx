@@ -113,6 +113,47 @@ const USER_STORIES = [
         story: "I want to assign a restricted 'GDPR' role to users so they can only access the GDPR dashboard for compliance audits.",
         status: "Completed",
         priority: "High"
+    {
+        id: "US-013",
+        role: "Developer",
+        feature: "API Integration",
+        story: "I want to be able to send SMS messages via a secure REST API.",
+        acceptanceCriteria: [
+            "Endpoint /api/v1/sms/send exists",
+            "Requires Bearer Token authentication",
+            "Validates request body (phone, message)",
+            "Returns 200 OK on success",
+            "Returns 401/403 on invalid auth"
+        ],
+        status: "Completed",
+        priority: "High"
+    },
+    {
+        id: "US-014",
+        role: "Security Officer",
+        feature: "API Security",
+        story: "I want API keys to be hashed in the database so that they are not visible to database administrators.",
+        acceptanceCriteria: [
+            "Keys generated securely (nanoid)",
+            "Keys stored as SHA-256 hashes",
+            "User sees key only once upon creation",
+            "API validates incoming key by hashing it"
+        ],
+        status: "Completed",
+        priority: "Critical"
+    },
+    {
+        id: "US-015",
+        role: "Security Officer",
+        feature: "User Security",
+        story: "I want user passwords to be hashed and salted to prevent credential theft.",
+        acceptanceCriteria: [
+            "Passwords hashed using bcrypt/scrypt",
+            "No plaintext passwords in database",
+            "Passwords salted to prevent rainbow table attacks"
+        ],
+        status: "Completed",
+        priority: "Critical"
     }
 ];
 
