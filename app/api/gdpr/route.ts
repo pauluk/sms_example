@@ -27,10 +27,10 @@ export async function GET(req: NextRequest) {
             isAllowed = true;
         } else if (isAdmin) {
             const adminConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'show_gdpr_to_admin'));
-            isAllowed = adminConfig[0]?.value !== 'false'; // Default TRUE for admins
+            isAllowed = adminConfig[0]?.value !== 'false';
         } else {
-            const teamConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'show_gdpr_to_teams'));
-            isAllowed = teamConfig[0]?.value === 'true'; // Default FALSE for teams
+            // Allow all users to search globally as per requirement
+            isAllowed = true;
         }
 
         if (!isAllowed) {
