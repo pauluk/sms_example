@@ -10,7 +10,7 @@ export default function SmsCompressorPage() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        // Fetch system config to see which provider is active
+        // Fetch system config to see which provider is active by default
         fetch("/api/admin/config")
             .then(res => res.json())
             .then(data => {
@@ -103,7 +103,24 @@ export default function SmsCompressorPage() {
                     {/* Input Section */}
                     <div className="space-y-6">
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                            <h2 className="text-lg font-semibold mb-4 text-gray-900">1. Enter Your Content</h2>
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-lg font-semibold text-gray-900">1. Enter Your Content</h2>
+                                <div className="flex bg-gray-100 p-1 rounded-lg">
+                                    <button
+                                        onClick={() => setProvider("risen")}
+                                        className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${provider === "risen" ? "bg-white shadow text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
+                                    >
+                                        Manual (RISEN)
+                                    </button>
+                                    <button
+                                        onClick={() => setProvider("gemini")}
+                                        className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${provider === "gemini" ? "bg-white shadow text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
+                                        title="Automated AI Compression"
+                                    >
+                                        AI Auto-Compress
+                                    </button>
+                                </div>
+                            </div>
                             <textarea
                                 value={inputText}
                                 onChange={(e) => setInputText(e.target.value)}

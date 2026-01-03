@@ -342,8 +342,9 @@ export default function AdminSettingsPage() {
 
                         <div className="space-y-6">
                             <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                <h3 className="font-medium text-gray-900 mb-4">AI Provider</h3>
+                                <h3 className="font-medium text-gray-900 mb-4">Default Mode</h3>
                                 <div className="space-y-3">
+                                    <p className="text-sm text-gray-500 mb-2">Select the initial mode users will see. They can switch between modes freely.</p>
                                     <label className="flex items-center gap-3 p-3 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
                                         <input
                                             type="radio"
