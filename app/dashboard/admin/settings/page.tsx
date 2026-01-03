@@ -19,6 +19,7 @@ export default function AdminSettingsPage() {
     const [maintenanceMode, setMaintenanceMode] = useState(false);
     const [showGdprToAdmin, setShowGdprToAdmin] = useState(true);
     const [showGdprToTeams, setShowGdprToTeams] = useState(false);
+    const [supportEmail, setSupportEmail] = useState("");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
@@ -41,7 +42,9 @@ export default function AdminSettingsPage() {
                     if (data.showUserStoriesToTeams !== undefined) setShowUserStoriesToTeams(data.showUserStoriesToTeams);
                     if (data.maintenanceMode !== undefined) setMaintenanceMode(data.maintenanceMode);
                     if (data.showGdprToAdmin !== undefined) setShowGdprToAdmin(data.showGdprToAdmin);
+                    if (data.showGdprToAdmin !== undefined) setShowGdprToAdmin(data.showGdprToAdmin);
                     if (data.showGdprToTeams !== undefined) setShowGdprToTeams(data.showGdprToTeams);
+                    if (data.supportEmail) setSupportEmail(data.supportEmail);
                 }
                 setLoading(false);
             })
@@ -65,7 +68,8 @@ export default function AdminSettingsPage() {
                     showUserStoriesToTeams,
                     maintenanceMode,
                     showGdprToAdmin,
-                    showGdprToTeams
+                    showGdprToTeams,
+                    supportEmail
                 }),
             });
             if (!res.ok) throw new Error("Failed to save");
@@ -127,6 +131,23 @@ export default function AdminSettingsPage() {
                             placeholder="nhsbsa.nhs.uk"
                         />
                     </div>
+
+                    <div className="space-y-4 mt-6">
+                        <label className="block text-sm font-medium text-gray-700">
+                            Global Support Email
+                        </label>
+                        <p className="text-xs text-gray-500 mb-2">
+                            Email address where support requests (including ban appeals) will be sent.
+                        </p>
+                        <input
+                            type="email"
+                            value={supportEmail}
+                            onChange={(e) => setSupportEmail(e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="support@example.com"
+                        />
+                    </div>
+
 
                     <div className="mt-8 pt-6 border-t">
                         <div className="flex items-start gap-4 mb-6">

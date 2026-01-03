@@ -93,6 +93,8 @@ export default function UsersPage() {
                                     <th className="px-6 py-4 border-b">Email</th>
                                     <th className="px-6 py-4 border-b">Role</th>
                                     <th className="px-6 py-4 border-b">Team</th>
+                                    <th className="px-6 py-4 border-b">Joined</th>
+                                    <th className="px-6 py-4 border-b">Last Login</th>
                                     <th className="px-6 py-4 border-b">Actions</th>
                                 </tr>
                             </thead>
@@ -129,6 +131,9 @@ export default function UsersPage() {
                                         </td>
                                         <td className="px-6 py-4 text-gray-500 font-mono text-xs">
                                             {u.createdAt ? format(new Date(u.createdAt), 'dd/MM/yyyy') : '-'}
+                                        </td>
+                                        <td className="px-6 py-4 text-gray-500 font-mono text-xs">
+                                            {u.lastLogin ? format(new Date(u.lastLogin), 'dd/MM/yyyy HH:mm') : <span className="text-gray-400 italic">Never</span>}
                                         </td>
                                         <td className="px-6 py-4">
                                             <button

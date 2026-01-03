@@ -1,9 +1,9 @@
 import { db } from "@/lib/db";
-import { user } from "@/lib/schema";
+import { user, session } from "@/lib/schema";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 
 export async function GET(req: Request) {
     const session = await auth.api.getSession({
@@ -14,7 +14,27 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const allUsers = await db.select().from(user).orderBy(desc(user.createdAt));
+    const allUsers = await db
+        .select({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            emailVerified: user.emailVerified,
+            image: user.image,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+            role: user.role,
+            teamId: user.teamId,
+            banned: user.banned,
+            banReason: user.banReason,
+            banExpires: user.banExpires,
+            lastLogin: sql<Date>`MAX(${session.createdAt})`,
+        })
+        .from(user)
+        .leftJoin(session, eq(session.userId, user.id))
+        .groupBy(user.id)
+        .orderBy(desc(user.createdAt));
+
     return NextResponse.json({ users: allUsers });
 }
 

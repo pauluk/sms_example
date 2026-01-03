@@ -12,6 +12,10 @@ export default async function Layout({ children }: { children: React.ReactNode }
         redirect("/");
     }
 
+    if (session.user.banned) {
+        redirect("/access-request");
+    }
+
     return (
         <DashboardLayout user={{
             ...session.user,

@@ -55,7 +55,9 @@ export async function GET(req: NextRequest) {
             showUserStoriesToTeams,
             maintenanceMode,
             showGdprToAdmin,
-            showGdprToTeams
+            showGdprToAdmin,
+            showGdprToTeams,
+            supportEmail: (await db.select().from(systemConfig).where(eq(systemConfig.key, 'support_email')))[0]?.value || ''
         });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -129,6 +131,12 @@ export async function PUT(req: NextRequest) {
             await db.insert(systemConfig)
                 .values({ key: 'show_gdpr_to_teams', value: String(showGdprToTeams) })
                 .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(showGdprToTeams), updatedAt: new Date() } });
+        }
+
+        if (body.supportEmail !== undefined) {
+            await db.insert(systemConfig)
+                .values({ key: 'support_email', value: body.supportEmail })
+                .onConflictDoUpdate({ target: systemConfig.key, set: { value: body.supportEmail, updatedAt: new Date() } });
         }
 
         return NextResponse.json({ success: true });
