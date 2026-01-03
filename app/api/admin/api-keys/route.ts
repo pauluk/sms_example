@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { eq, desc } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { hashKey } from "@/lib/crypto";
 
 export async function GET(req: NextRequest) {
     const session = await auth.api.getSession({
@@ -38,16 +39,18 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
-    const key = `sk_live_${nanoid(32)}`;
+    const rawKey = `sk_live_${nanoid(32)}`;
+    const hashedKey = hashKey(rawKey);
 
     await db.insert(apiKey).values({
         id: nanoid(),
         name,
-        key,
+        key: hashedKey, // Store the hash
         userId: session.user.id,
     });
 
-    return NextResponse.json({ success: true, key });
+    // Return the RAW key to the user (first and last time)
+    return NextResponse.json({ success: true, key: rawKey });
 }
 
 export async function DELETE(req: NextRequest) {

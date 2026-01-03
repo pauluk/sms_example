@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { apiKey, smsLog, systemConfig, user } from "@/lib/schema";
 import { eq, and, gt, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { hashKey } from "@/lib/crypto";
 import { NotifyClient } from "notifications-node-client";
 import { GLOBAL_TEMPLATE_ID } from "@/config/teams";
 
@@ -18,9 +19,10 @@ export async function POST(req: NextRequest) {
         }
 
         const token = authHeader.split(" ")[1];
+        const hashedToken = hashKey(token);
 
         // 2. Validate Token
-        const keyRecord = await db.select().from(apiKey).where(and(eq(apiKey.key, token), eq(apiKey.isActive, true)));
+        const keyRecord = await db.select().from(apiKey).where(and(eq(apiKey.key, hashedToken), eq(apiKey.isActive, true)));
 
         if (!keyRecord || keyRecord.length === 0) {
             return NextResponse.json({ error: "Unauthorized: Invalid or inactive API key" }, { status: 401 });

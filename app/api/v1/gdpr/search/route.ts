@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { apiKey, smsLog } from "@/lib/schema";
 import { eq, and, like, desc } from "drizzle-orm";
+import { hashKey } from "@/lib/crypto";
 
 export async function GET(req: NextRequest) {
     try {
@@ -12,9 +13,10 @@ export async function GET(req: NextRequest) {
         }
 
         const token = authHeader.split(" ")[1];
+        const hashedToken = hashKey(token);
 
         // 2. Validate Token
-        const keyRecord = await db.select().from(apiKey).where(and(eq(apiKey.key, token), eq(apiKey.isActive, true)));
+        const keyRecord = await db.select().from(apiKey).where(and(eq(apiKey.key, hashedToken), eq(apiKey.isActive, true)));
 
         if (!keyRecord || keyRecord.length === 0) {
             return NextResponse.json({ error: "Unauthorized: Invalid or inactive API key" }, { status: 401 });
