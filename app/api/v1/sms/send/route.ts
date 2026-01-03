@@ -35,10 +35,10 @@ export async function POST(req: NextRequest) {
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
         // Count usage
-        const usage = await db.select({ count: snapshot => sql<number>`count(*)` }) // Drizzle count
+        const usage = await db.select({ count: sql<number>`count(*)` })
             .from(smsLog)
             .where(and(
-                eq(smsLog.userId, validKey.userId),
+                eq(smsLog.userId, validKey.userId || ""),
                 eq(smsLog.teamId, 'API_EXTERNAL'),
                 gt(smsLog.sentAt, oneHourAgo)
             ));
