@@ -33,9 +33,13 @@ export async function POST(req: NextRequest) {
         }
         // Note: Both 'user' and 'admin' can create stories now. Only 'admin' can update.
 
-
         const body = await req.json();
-        const { role, feature, story, priority, status } = body;
+        let { role, feature, story, priority, status } = body;
+
+        // Force 'Backlog' status for non-admins
+        if (session.user.role !== 'admin') {
+            status = 'Backlog';
+        }
 
         // Basic validation
         if (!role || !feature || !story || !priority || !status) {

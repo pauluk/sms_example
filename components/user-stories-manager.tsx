@@ -134,7 +134,7 @@ export default function UserStoriesManager({ isAdmin }: { isAdmin: boolean }) {
         setEditingStory(null);
         setFormData({
             priority: 'Medium',
-            status: 'Pending',
+            status: 'Backlog',
             role: 'User'
         });
         setIsDialogOpen(true);
@@ -178,6 +178,7 @@ export default function UserStoriesManager({ isAdmin }: { isAdmin: boolean }) {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Statuses</SelectItem>
+                            <SelectItem value="Backlog">Backlog</SelectItem>
                             <SelectItem value="Pending">Pending</SelectItem>
                             <SelectItem value="In Progress">In Progress</SelectItem>
                             <SelectItem value="Completed">Completed</SelectItem>
@@ -241,8 +242,10 @@ export default function UserStoriesManager({ isAdmin }: { isAdmin: boolean }) {
                                             variant="outline"
                                             className={
                                                 story.status === 'Completed' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                    story.status === 'In Progress' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                                                        'bg-gray-50 text-gray-700 border-gray-200'
+                                                    story.status === 'Completed' ? 'bg-green-50 text-green-700 border-green-200' :
+                                                        story.status === 'In Progress' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                                            story.status === 'Backlog' ? 'bg-zinc-100 text-zinc-600 border-zinc-200' :
+                                                                'bg-gray-50 text-gray-700 border-gray-200'
                                             }
                                         >
                                             {story.status}
@@ -307,11 +310,16 @@ export default function UserStoriesManager({ isAdmin }: { isAdmin: boolean }) {
                             </div>
                             <div className="space-y-2">
                                 <Label>Status</Label>
-                                <Select value={formData.status} onValueChange={(val) => setFormData({ ...formData, status: val })}>
+                                <Select
+                                    value={formData.status}
+                                    onValueChange={(val) => setFormData({ ...formData, status: val })}
+                                    disabled={!isAdmin && !editingStory} // Disable for non-admins creating/viewing
+                                >
                                     <SelectTrigger>
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
+                                        <SelectItem value="Backlog">Backlog</SelectItem>
                                         <SelectItem value="Pending">Pending</SelectItem>
                                         <SelectItem value="In Progress">In Progress</SelectItem>
                                         <SelectItem value="Completed">Completed</SelectItem>
