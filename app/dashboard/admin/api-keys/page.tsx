@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Trash2, Key, Copy, Check } from "lucide-react";
+import { Loader2, Plus, Trash2, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function ApiKeysPage() {
     const { data: session, isPending } = authClient.useSession();
@@ -48,6 +48,7 @@ export default function ApiKeysPage() {
         e.preventDefault();
         if (!newName) return;
         setCreating(true);
+        setNewKey(null);
         try {
             const res = await fetch("/api/admin/api-keys", {
                 method: "POST",
@@ -56,7 +57,7 @@ export default function ApiKeysPage() {
             });
             const data = await res.json();
             if (res.ok) {
-                setNewKey(data.key);
+                setNewKey(data.key); // Raw key from response
                 setNewName("");
                 fetchKeys();
                 toast.success("API Key created successfully");
@@ -134,7 +135,7 @@ export default function ApiKeysPage() {
                                         <TableRow key={key.id}>
                                             <TableCell className="font-medium">{key.name}</TableCell>
                                             <TableCell className="font-mono text-xs text-muted-foreground">
-                                                {key.key.substring(0, 12)}...
+                                                sk_live_...
                                             </TableCell>
                                             <TableCell className="text-xs">
                                                 {new Date(key.createdAt).toLocaleDateString()}
@@ -184,25 +185,23 @@ export default function ApiKeysPage() {
                     </Card>
 
                     {newKey && (
-                        <Card className="border-green-500 bg-green-50">
-                            <CardHeader>
-                                <CardTitle className="text-green-700 flex items-center gap-2">
-                                    <Check className="h-5 w-5" />
-                                    Key Generated
-                                </CardTitle>
-                                <CardDescription className="text-green-600">
-                                    Copy this key now. You won't be able to see it again.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="flex items-center gap-2 bg-white p-2 rounded border border-green-200">
-                                    <code className="text-sm font-mono flex-1 break-all text-gray-800">{newKey}</code>
-                                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard(newKey)}>
-                                        <Copy className="h-4 w-4" />
+                        <Alert className="border-green-500 bg-green-50">
+                            <Check className="h-4 w-4 text-green-600" />
+                            <AlertTitle className="text-green-800">Key Generated Successfully</AlertTitle>
+                            <AlertDescription className="mt-2">
+                                <p className="text-sm text-green-700 mb-2">
+                                    This is the <strong>only time</strong> your API key will be visible. Please copy it immediately.
+                                </p>
+                                <div className="flex items-center gap-2">
+                                    <code className="bg-white px-3 py-2 rounded border border-green-200 font-mono text-sm flex-1 break-all text-gray-800">
+                                        {newKey}
+                                    </code>
+                                    <Button size="sm" variant="outline" className="border-green-200 hover:bg-green-100 text-green-700" onClick={() => copyToClipboard(newKey)}>
+                                        <Copy className="h-3 w-3 mr-1" /> Copy
                                     </Button>
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </AlertDescription>
+                        </Alert>
                     )}
                 </div>
             </div>
