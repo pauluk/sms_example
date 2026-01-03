@@ -25,10 +25,10 @@ export default function GDPRPage() {
         e.preventDefault();
         if (!mobile) return;
 
-        // Client-side role check (Backup to proper server-side middleware)
-        // @ts-ignore
-        if (session?.user?.role !== 'admin' && session?.user?.role !== 'gdpr') {
-            toast.error("Unauthorized: You do not have permission.");
+        // Client-side role check
+        // Allow all authenticated users to search (Server-side also enforces this)
+        if (!session?.user) {
+            toast.error("Unauthorised: You must be logged in.");
             return;
         }
 
@@ -41,7 +41,7 @@ export default function GDPRPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                if (res.status === 403) throw new Error("Unauthorized: You do not have permission to access GDPR search.");
+                if (res.status === 403) throw new Error("Unauthorised: You do not have permission to access GDPR search.");
                 throw new Error(data.error || "Failed to search");
             }
 
