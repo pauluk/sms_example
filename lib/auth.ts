@@ -69,8 +69,23 @@ export const auth = betterAuth({
             },
             teamId: {
                 type: "string",
-                required: true,
-                input: true // Allow input during signup
+                required: false, // Changed to false to avoid issues if not compliant? Or keep true.
+                input: true
+            },
+            banned: {
+                type: "boolean",
+                required: false,
+                input: false // Admin only
+            },
+            banReason: {
+                type: "string",
+                required: false,
+                input: false
+            },
+            banExpires: {
+                type: "date",
+                required: false,
+                input: false
             }
         }
     },
