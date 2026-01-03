@@ -1,13 +1,54 @@
 "use client";
-import React, { useState } from "react";
-import { Copy, ArrowRight, MessageSquare, Sparkles, ExternalLink } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Copy, ArrowRight, MessageSquare, Sparkles, ExternalLink, Loader2, Bot } from "lucide-react";
 
 export default function SmsCompressorPage() {
     const [inputText, setInputText] = useState("");
     const [generatedPrompt, setGeneratedPrompt] = useState("");
     const [targetLength, setTargetLength] = useState<160 | 370>(160);
+    const [provider, setProvider] = useState<"risen" | "gemini">("risen");
+    const [loading, setLoading] = useState(false);
 
-    const generatePrompt = () => {
+    useEffect(() => {
+        // Fetch system config to see which provider is active
+        fetch("/api/admin/config")
+            .then(res => res.json())
+            .then(data => {
+                if (data.smsCompressorProvider) {
+                    setProvider(data.smsCompressorProvider);
+                }
+            })
+            .catch(err => console.error("Failed to fetch config", err));
+    }, []);
+
+    const handleGenerate = async () => {
+        if (!inputText.trim()) return;
+
+        if (provider === "gemini") {
+            setLoading(true);
+            try {
+                const res = await fetch("/api/ai/compress", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: inputText, maxChars: targetLength })
+                });
+
+                if (!res.ok) throw new Error("Generation failed");
+
+                const data = await res.json();
+                setGeneratedPrompt(data.text);
+            } catch (err) {
+                alert("Failed to generate with AI. Please try again.");
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        } else {
+            generateRisenPrompt();
+        }
+    };
+
+    const generateRisenPrompt = () => {
         if (!inputText.trim()) return;
 
         const prompt = `
@@ -17,10 +58,16 @@ export default function SmsCompressorPage() {
 "${inputText}"
 
 **STEPS**:
-1. Analyze the core message and call-to-action in the input text.
+1. Analyze the core message and call-to-action.
 2. Draft a new version that conveys the exact same specific meaning but condensed.
-3. Ensure the tone remains professional, authoritative, and trustworthy (suitable for UK Government communications).
-4. Strictly adhere to the character limit.
+3. Ensure the tone remains professional but accessible (Plain English).
+4. Reframe for a broad audience (Grade 6 reading level).
+5. Remove unnecessary government jargon.
+6. Strictly adhere to the character limit.
+7. Optimize for SMS (Clear hook, immediate value).
+8. Use UK English spelling.
+9. Use dd/mm/yyyy date format.
+10. Use GBP (£) for currency.
 
 **END GOAL**: A single, clear SMS message.
 
@@ -81,22 +128,44 @@ export default function SmsCompressorPage() {
                                 </div>
 
                                 <button
-                                    onClick={generatePrompt}
-                                    disabled={!inputText.trim()}
+                                    onClick={handleGenerate}
+                                    disabled={!inputText.trim() || loading}
                                     className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Generate Prompt
-                                    <ArrowRight className="w-4 h-4" />
+                                    {provider === 'gemini' ? (
+                                        <>
+                                            <Bot className="w-4 h-4" />
+                                            Compress with AI
+                                        </>
+                                    ) : (
+                                        <>
+                                            Generate Prompt
+                                            <ArrowRight className="w-4 h-4" />
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>
                     </div>
 
                     {/* Output Section */}
-                    <div className="space-y-6">
+                    <div className="space-y-6 relative">
+                        {/* Splash Screen Overlay */}
+                        {loading && (
+                            <div className="absolute inset-0 bg-white/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl border border-gray-200">
+                                <div className="bg-blue-50 p-4 rounded-full mb-4 animate-pulse">
+                                    <Sparkles className="w-8 h-8 text-blue-600 animate-spin-slow" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900">AI is thinking...</h3>
+                                <p className="text-gray-500 mt-2">Condensing your message intelligently.</p>
+                            </div>
+                        )}
+
                         <div className={`bg-white p-6 rounded-xl shadow-sm border border-gray-200 h-full transition-opacity duration-300 ${generatedPrompt ? 'opacity-100' : 'opacity-50 grayscale'}`}>
                             <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold text-gray-900">2. Copy RISEN Prompt</h2>
+                                <h2 className="text-lg font-semibold text-gray-900">
+                                    {provider === 'gemini' ? '2. AI Output' : '2. Copy RISEN Prompt'}
+                                </h2>
                                 {generatedPrompt && (
                                     <button
                                         onClick={copyToClipboard}

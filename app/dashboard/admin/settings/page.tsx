@@ -358,12 +358,11 @@ export default function AdminSettingsPage() {
                                             <div className="text-sm text-gray-500">Generates engineered prompts for use with any LLM (Manual).</div>
                                         </div>
                                     </label>
-                                    <label className="flex items-center gap-3 p-3 bg-white border rounded-lg cursor-not-allowed opacity-60">
+                                    <label className="flex items-center gap-3 p-3 bg-white border rounded-lg">
                                         <input
                                             type="radio"
                                             name="provider"
                                             value="gemini"
-                                            disabled
                                             checked={smsCompressorProvider === "gemini"}
                                             onChange={(e) => setSmsCompressorProvider("gemini")}
                                             className="w-4 h-4 text-blue-600 focus:ring-blue-500"
@@ -371,7 +370,7 @@ export default function AdminSettingsPage() {
                                         <div>
                                             <div className="font-medium text-gray-900 flex items-center gap-2">
                                                 Gemini 1.5 Flash API
-                                                <Badge variant="secondary" className="text-xs">Coming Soon</Badge>
+                                                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200">Active</Badge>
                                             </div>
                                             <div className="text-sm text-gray-500">Automated compression via Google Gemini API.</div>
                                         </div>
