@@ -97,7 +97,8 @@ echo $response;`;
     };
 
     const generatePowerAutomate = () => {
-        return `1. Add "HTTP" Connector
+        return `1. Search for "HTTP" (Green icon, Premium)
+   *IMPORTANT: Do NOT use "Send HTTP request (SharePoint/Graph)"*
 2. Method: POST
 3. URI: ${endpoint}
 4. Headers:
@@ -162,14 +163,24 @@ echo $response;`;
                         <h1 className="text-3xl font-bold tracking-tight">API Playground</h1>
                         <p className="text-muted-foreground mt-1">Test the Secure SMS API endpoint in real-time.</p>
                     </div>
-                    <a
-                        href="/sms-api.postman_collection.json"
-                        download="sms-api.postman_collection.json"
-                        className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
-                    >
-                        <Download className="w-4 h-4" />
-                        Download Postman Collection
-                    </a>
+                    <div className="flex gap-4">
+                        <a
+                            href="/downloads/ExampleAPIpowerautomate.zip"
+                            download="ExampleAPIpowerautomate.zip"
+                            className="flex items-center gap-2 text-sm font-medium text-purple-600 hover:text-purple-800 transition-colors"
+                        >
+                            <Download className="w-4 h-4" />
+                            Flow Template (Zip)
+                        </a>
+                        <a
+                            href="/sms-api.postman_collection.json"
+                            download="sms-api.postman_collection.json"
+                            className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                        >
+                            <Download className="w-4 h-4" />
+                            Postman Collection
+                        </a>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
