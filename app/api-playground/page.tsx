@@ -34,6 +34,68 @@ export default function ApiPlayground() {
   }'`;
     };
 
+    const generateNode = () => {
+        return `const response = await fetch("${endpoint}", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer ${apiKey}",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    phoneNumber: "${phoneNumber}",
+    message: "${message.replace(/"/g, '\\"')}",
+  }),
+});
+
+const data = await response.json();
+console.log(data);`;
+    };
+
+    const generatePython = () => {
+        return `import requests
+
+url = "${endpoint}"
+headers = {
+    "Authorization": "Bearer ${apiKey}",
+    "Content-Type": "application/json"
+}
+data = {
+    "phoneNumber": "${phoneNumber}",
+    "message": "${message.replace(/"/g, '\\"')}"
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())`;
+    };
+
+    const generatePhp = () => {
+        return `<?php
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+  CURLOPT_URL => '${endpoint}',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'POST',
+  CURLOPT_POSTFIELDS =>'{
+    "phoneNumber": "${phoneNumber}",
+    "message": "${message.replace(/"/g, '\\"')}"
+}',
+  CURLOPT_HTTPHEADER => array(
+    'Authorization: Bearer ${apiKey}',
+    'Content-Type: application/json'
+  ),
+));
+
+$response = curl_exec($curl);
+curl_close($curl);
+echo $response;`;
+    };
+
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
         toast.success("Copied to clipboard");
@@ -172,22 +234,54 @@ export default function ApiPlayground() {
 
                     {/* Code & Response */}
                     <div className="space-y-6">
-                        {/* Curl Preview */}
+                        {/* Code Snippets */}
                         <Card className="bg-slate-950 text-slate-50 border-slate-800">
                             <CardHeader className="pb-3 border-b border-slate-800">
-                                <div className="flex items-center justify-between">
-                                    <div className="space-y-1">
-                                        <CardTitle className="text-sm font-mono text-slate-300">Request Preview</CardTitle>
-                                    </div>
-                                    <Button variant="ghost" size="sm" className="h-8 w-8 text-slate-400 hover:text-slate-100 hover:bg-slate-800" onClick={() => copyToClipboard(generateCurl())}>
-                                        <Copy className="h-4 w-4" />
-                                    </Button>
-                                </div>
+                                <CardTitle className="text-sm font-mono text-slate-300">Integration Code</CardTitle>
                             </CardHeader>
-                            <CardContent className="pt-4 overflow-x-auto">
-                                <pre className="text-xs font-mono leading-relaxed text-green-400">
-                                    {generateCurl()}
-                                </pre>
+                            <CardContent className="pt-4">
+                                <Tabs defaultValue="curl" className="w-full" onValueChange={setActiveTab}>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <TabsList className="bg-slate-900 border-slate-800">
+                                            <TabsTrigger value="curl" className="data-[state=active]:bg-slate-800 data-[state=active]:text-slate-100">cURL</TabsTrigger>
+                                            <TabsTrigger value="node" className="data-[state=active]:bg-slate-800 data-[state=active]:text-slate-100">Node.js</TabsTrigger>
+                                            <TabsTrigger value="python" className="data-[state=active]:bg-slate-800 data-[state=active]:text-slate-100">Python</TabsTrigger>
+                                            <TabsTrigger value="php" className="data-[state=active]:bg-slate-800 data-[state=active]:text-slate-100">PHP</TabsTrigger>
+                                        </TabsList>
+                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+                                            onClick={() => {
+                                                if (activeTab === 'curl') copyToClipboard(generateCurl());
+                                                if (activeTab === 'node') copyToClipboard(generateNode());
+                                                if (activeTab === 'python') copyToClipboard(generatePython());
+                                                if (activeTab === 'php') copyToClipboard(generatePhp());
+                                            }}>
+                                            <Copy className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+
+                                    <div className="relative overflow-x-auto">
+                                        <TabsContent value="curl" className="mt-0">
+                                            <pre className="text-xs font-mono leading-relaxed text-green-400">
+                                                {generateCurl()}
+                                            </pre>
+                                        </TabsContent>
+                                        <TabsContent value="node" className="mt-0">
+                                            <pre className="text-xs font-mono leading-relaxed text-blue-400">
+                                                {generateNode()}
+                                            </pre>
+                                        </TabsContent>
+                                        <TabsContent value="python" className="mt-0">
+                                            <pre className="text-xs font-mono leading-relaxed text-yellow-400">
+                                                {generatePython()}
+                                            </pre>
+                                        </TabsContent>
+                                        <TabsContent value="php" className="mt-0">
+                                            <pre className="text-xs font-mono leading-relaxed text-purple-400">
+                                                {generatePhp()}
+                                            </pre>
+                                        </TabsContent>
+                                    </div>
+                                </Tabs>
                             </CardContent>
                         </Card>
 
