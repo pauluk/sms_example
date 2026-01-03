@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Play, Copy, Check } from "lucide-react";
+import { Loader2, Play, Copy, Check, Download } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -81,9 +81,19 @@ export default function ApiPlayground() {
     return (
         <div className="min-h-screen bg-gray-50/50 p-6 md:p-10">
             <div className="max-w-6xl mx-auto space-y-6">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">API Playground</h1>
-                    <p className="text-muted-foreground mt-1">Test the Secure SMS API endpoint in real-time.</p>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">API Playground</h1>
+                        <p className="text-muted-foreground mt-1">Test the Secure SMS API endpoint in real-time.</p>
+                    </div>
+                    <a
+                        href="/sms-api.postman_collection.json"
+                        download="sms-api.postman_collection.json"
+                        className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                        <Download className="w-4 h-4" />
+                        Download Postman Collection
+                    </a>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
