@@ -127,7 +127,7 @@ export function CalculatorCharts({ data }: CalculatorChartsProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-white p-4 border rounded-xl">
-                    <div className="font-bold mb-1">SMSUtilisation</div>
+                    <div className="font-bold mb-1">SMS Utilisation</div>
                     <div className="text-xs text-muted-foreground mb-4">Free vs chargeable</div>
                     <div className="h-[200px]">
                         <Doughnut data={smsSplitData} options={donutOptions} />

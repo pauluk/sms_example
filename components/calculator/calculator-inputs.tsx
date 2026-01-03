@@ -70,7 +70,7 @@ export function CalculatorInputs({ state, onChange }: CalculatorInputsProps) {
                             min={50}
                             max={40000}
                             step={50}
-                            onValueChange={(vals) => onChange('volume', vals[0])}
+                            onValueChange={(vals: number[]) => onChange('volume', vals[0])}
                         />
                         <div className="flex justify-between text-xs text-muted-foreground mt-1">
                             <span>50</span>
@@ -209,7 +209,7 @@ export function CalculatorInputs({ state, onChange }: CalculatorInputsProps) {
                                 min={0}
                                 max={50}
                                 step={1}
-                                onValueChange={(vals) => onChange('labourPct', vals[0])}
+                                onValueChange={(vals: number[]) => onChange('labourPct', vals[0])}
                             />
                         </div>
                     </div>

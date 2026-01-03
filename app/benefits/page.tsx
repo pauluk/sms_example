@@ -255,7 +255,7 @@ Carbon:
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-bold">Analysis Report</h2>
                                 <Badge variant="outline" className="font-mono">
-                                    {new Date().toLocaleDateString()}
+                                    {new Date().toLocaleDateString('en-GB')}
                                 </Badge>
                             </div>
 
