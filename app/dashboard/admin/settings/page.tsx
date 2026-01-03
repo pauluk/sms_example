@@ -116,6 +116,30 @@ export default function AdminSettingsPage() {
                         </div>
                     </div>
 
+                    <div className="flex items-start gap-4 mb-6">
+                        <div className="p-3 bg-green-100 text-green-600 rounded-lg">
+                            <ShieldCheck className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-900">API Integration</h2>
+                            <p className="text-gray-500">Manage external access and developer tools.</p>
+                            <div className="bg-white p-6 rounded-lg border shadow-sm mt-4 grid gap-4 grid-cols-1 md:grid-cols-2">
+                                <Link href="/dashboard/admin/api-keys" className="block">
+                                    <div className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                                        <h3 className="font-semibold text-gray-900 mb-1">Manage API Keys</h3>
+                                        <p className="text-sm text-gray-500">Create and revoke secure Bearer tokens for external systems.</p>
+                                    </div>
+                                </Link>
+                                <Link href="/api-playground" className="block">
+                                    <div className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                                        <h3 className="font-semibold text-gray-900 mb-1">API Playground</h3>
+                                        <p className="text-sm text-gray-500">Interactive testing console for the Send SMS endpoint.</p>
+                                    </div>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="space-y-4">
                         <label className="block text-sm font-medium text-gray-700">
                             Allowed Email Domains
