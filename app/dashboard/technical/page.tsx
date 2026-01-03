@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Server, Database, Lock, Globe, Code2, Layout } from "lucide-react";
+import { Server, Database, Lock, Globe, Code2, Layout, Network } from "lucide-react";
 import { useEffect } from "react";
 import mermaid from "mermaid";
 import { authClient } from "@/lib/auth-client";
@@ -119,6 +119,30 @@ export default function TechnicalPage() {
                         </p>
                     </CardContent>
                 </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Network className="h-5 w-5 text-orange-600" />
+                            API Architecture & Endpoints
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="flex flex-wrap gap-2">
+                            <Badge variant="outline">REST</Badge>
+                            <Badge variant="outline">JSON</Badge>
+                        </div>
+                        <div className="space-y-3 text-sm">
+                            <div className="border-l-2 border-slate-200 pl-3">
+                                <p className="font-mono text-xs font-semibold text-slate-700">POST /api/v1/sms/send</p>
+                                <p className="text-gray-600">Secure Dispatch via GOV.UK Notify.</p>
+                            </div>
+                            <div className="border-l-2 border-slate-200 pl-3">
+                                <p className="font-mono text-xs font-semibold text-slate-700">GET /api/v1/gdpr/search</p>
+                                <p className="text-gray-600">DSAR Compliance Search.</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
 
             <Card className="bg-slate-900 text-white border-slate-800">
@@ -146,6 +170,6 @@ export default function TechnicalPage() {
                     </pre>
                 </CardContent>
             </Card>
-        </div>
+        </div >
     );
 }
