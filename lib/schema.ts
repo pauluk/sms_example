@@ -131,3 +131,15 @@ export const apiKey = pgTable("api_key", {
     createdAt: timestamp("created_at").defaultNow(),
     lastUsedAt: timestamp("last_used_at"),
 });
+
+export const userStory = pgTable("user_story", {
+    id: text("id").primaryKey(), // e.g., 'US-001'
+    role: text("role").notNull(),
+    feature: text("feature").notNull(),
+    story: text("story").notNull(),
+    acceptanceCriteria: text("acceptance_criteria"), // JSON stringified array
+    priority: text("priority").notNull(), // High, Medium, Low, Critical
+    status: text("status").notNull(), // Pending, In Progress, Completed
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+});
