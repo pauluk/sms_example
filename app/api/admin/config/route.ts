@@ -57,7 +57,8 @@ export async function GET(req: NextRequest) {
             showGdprToAdmin,
 
             showGdprToTeams,
-            supportEmail: (await db.select().from(systemConfig).where(eq(systemConfig.key, 'support_email')))[0]?.value || ''
+            supportEmail: (await db.select().from(systemConfig).where(eq(systemConfig.key, 'support_email')))[0]?.value || '',
+            rateLimitPerHour: parseInt((await db.select().from(systemConfig).where(eq(systemConfig.key, 'rate_limit_per_hour')))[0]?.value || '100')
         });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -83,7 +84,8 @@ export async function PUT(req: NextRequest) {
             showUserStoriesToTeams,
             maintenanceMode,
             showGdprToAdmin,
-            showGdprToTeams
+            showGdprToTeams,
+            rateLimitPerHour
         } = body;
 
         if (allowedDomains !== undefined) {
@@ -137,6 +139,12 @@ export async function PUT(req: NextRequest) {
             await db.insert(systemConfig)
                 .values({ key: 'support_email', value: body.supportEmail })
                 .onConflictDoUpdate({ target: systemConfig.key, set: { value: body.supportEmail, updatedAt: new Date() } });
+        }
+
+        if (rateLimitPerHour !== undefined) {
+            await db.insert(systemConfig)
+                .values({ key: 'rate_limit_per_hour', value: String(rateLimitPerHour) })
+                .onConflictDoUpdate({ target: systemConfig.key, set: { value: String(rateLimitPerHour), updatedAt: new Date() } });
         }
 
         return NextResponse.json({ success: true });
