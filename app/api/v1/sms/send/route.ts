@@ -88,7 +88,12 @@ export async function POST(req: NextRequest) {
                 }
             });
         } catch (notifyError: any) {
-            console.error("Notify API Error:", notifyError);
+            // Secure Logging: Don't log full object to avoid leaking headers/keys
+            console.error("Notify API Error:", {
+                statusCode: notifyError.response?.status,
+                errorCode: notifyError.code,
+                message: notifyError.message
+            });
             // Log failure
             await db.insert(smsLog).values({
                 id: nanoid(),
