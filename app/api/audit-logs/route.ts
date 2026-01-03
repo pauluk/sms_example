@@ -20,6 +20,11 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "Missing teamId" }, { status: 400 });
         }
 
+        // Restrict access: Non-admins can only view their own team's logs
+        if (session.user.role !== 'admin' && session.user.teamId !== teamId) {
+            return NextResponse.json({ error: "Unauthorized access to team logs" }, { status: 403 });
+        }
+
         const logs = await db.select()
             .from(smsLog)
             .where(eq(smsLog.teamId, teamId))
