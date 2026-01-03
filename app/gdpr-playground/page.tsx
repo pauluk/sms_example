@@ -82,7 +82,7 @@ export default function GdprPlayground() {
                                         />
                                         <Button
                                             variant="outline"
-                                            onClick={() => setApiKey("sk_live_" + "UKesglKeeM930bx3QTwov4IxtoadSCfX")}
+                                            onClick={() => setApiKey("sk_live_" + "wfV_V4n5RCIaCNzvgYqwzZK0b8mMruwG")}
                                             title="Use Test Key"
                                             type="button"
                                             className="whitespace-nowrap"
