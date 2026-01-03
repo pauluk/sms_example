@@ -1,0 +1,66 @@
+{
+    "info": {
+        "_postman_id": "b5a4c2d1-e8f0-4a1b-9c3d-7e6f8a9b0c1d",
+        "name": "GDPR Search API",
+        "description": "Collection for testing the GDPR Mobile Record Search API.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Search Records",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{api_key}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/gdpr/search?number={{phone_number}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "gdpr",
+                        "search"
+                    ],
+                    "query": [
+                        {
+                            "key": "number",
+                            "value": "{{phone_number}}",
+                            "description": "The last 10 digits of the phone number to search for."
+                        }
+                    ]
+                },
+                "description": "Search for SMS records associated with a specific mobile number."
+            },
+            "response": []
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:3000",
+            "type": "string"
+        },
+        {
+            "key": "api_key",
+            "value": "sk_live_wfV_V4n5RCIaCNzvgYqwzZK0b8mMruwG",
+            "type": "string"
+        },
+        {
+            "key": "phone_number",
+            "value": "07879678288",
+            "type": "string"
+        }
+    ]
+}
