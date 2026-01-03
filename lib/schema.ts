@@ -121,3 +121,13 @@ export const serviceAssessment = pgTable("service_assessment", {
     updatedAt: timestamp("updated_at"),
     updatedBy: text("updated_by"),
 });
+
+export const apiKey = pgTable("api_key", {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    key: text("key").notNull().unique(), // Storing plain text for MVP as per plan
+    userId: text("user_id").references(() => user.id),
+    isActive: boolean("is_active").default(true),
+    createdAt: timestamp("created_at").defaultNow(),
+    lastUsedAt: timestamp("last_used_at"),
+});
