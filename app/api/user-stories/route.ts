@@ -28,9 +28,11 @@ export async function POST(req: NextRequest) {
         const session = await auth.api.getSession({
             headers: await headers()
         });
-        if (!session || session.user.role !== 'admin') {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        if (!session) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
+        // Note: Both 'user' and 'admin' can create stories now. Only 'admin' can update.
+
 
         const body = await req.json();
         const { role, feature, story, priority, status } = body;

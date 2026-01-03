@@ -184,11 +184,9 @@ export default function UserStoriesManager({ isAdmin }: { isAdmin: boolean }) {
                         </SelectContent>
                     </Select>
 
-                    {isAdmin && (
-                        <Button onClick={openCreate} className="whitespace-nowrap">
-                            <Plus className="mr-2 h-4 w-4" /> New Story
-                        </Button>
-                    )}
+                    <Button onClick={openCreate} className="whitespace-nowrap">
+                        <Plus className="mr-2 h-4 w-4" /> New Story
+                    </Button>
                 </div>
             </div>
 
