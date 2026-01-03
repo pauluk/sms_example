@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { apiKey, smsLog, systemConfig, user } from "@/lib/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, gt, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { NotifyClient } from "notifications-node-client";
 import { GLOBAL_TEMPLATE_ID } from "@/config/teams";
@@ -27,6 +27,27 @@ export async function POST(req: NextRequest) {
         }
 
         const validKey = keyRecord[0];
+
+        // 2a. Rate Limit Check
+        const limitConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'rate_limit_per_hour'));
+        const limit = parseInt(limitConfig[0]?.value || "100");
+
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
+        // Count usage
+        const usage = await db.select({ count: snapshot => sql<number>`count(*)` }) // Drizzle count
+            .from(smsLog)
+            .where(and(
+                eq(smsLog.userId, validKey.userId),
+                eq(smsLog.teamId, 'API_EXTERNAL'),
+                gt(smsLog.sentAt, oneHourAgo)
+            ));
+
+        const currentUsage = Number(usage[0]?.count || 0);
+
+        if (currentUsage >= limit) {
+            return NextResponse.json({ error: `Rate limit exceeded. Max ${limit} messages per hour.` }, { status: 429 });
+        }
 
         // 3. Update Last Used
         await db.update(apiKey).set({ lastUsedAt: new Date() }).where(eq(apiKey.id, validKey.id));
