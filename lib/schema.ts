@@ -10,6 +10,9 @@ export interface SystemConfig {
     smsCompressorProvider: 'risen' | 'gemini';
     smsCompressorMaxChars: 160 | 370;
     geminiApiKey: string;
+    enableManualCompressor: boolean;
+    enableGeminiCompressor: boolean;
+    showSmsCompressorLink: boolean;
 }
 
 export const DEFAULT_SYSTEM_CONFIG: SystemConfig = {
@@ -22,6 +25,9 @@ export const DEFAULT_SYSTEM_CONFIG: SystemConfig = {
     smsCompressorProvider: 'risen',
     smsCompressorMaxChars: 160,
     geminiApiKey: '',
+    enableManualCompressor: true,
+    enableGeminiCompressor: true,
+    showSmsCompressorLink: true,
 };
 
 export const user = pgTable("user", {

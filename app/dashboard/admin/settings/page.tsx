@@ -25,6 +25,9 @@ export default function AdminSettingsPage() {
     const [saving, setSaving] = useState(false);
     const [smsCompressorProvider, setSmsCompressorProvider] = useState<"risen" | "gemini">("risen");
     const [smsCompressorMaxChars, setSmsCompressorMaxChars] = useState<160 | 370>(160);
+    const [enableManualCompressor, setEnableManualCompressor] = useState(true);
+    const [enableGeminiCompressor, setEnableGeminiCompressor] = useState(true);
+    const [showSmsCompressorLink, setShowSmsCompressorLink] = useState(true);
 
     useEffect(() => {
         fetch("/api/admin/config")
@@ -50,6 +53,9 @@ export default function AdminSettingsPage() {
                     if (data.rateLimitPerHour !== undefined) setRateLimitPerHour(data.rateLimitPerHour);
                     if (data.smsCompressorProvider) setSmsCompressorProvider(data.smsCompressorProvider);
                     if (data.smsCompressorMaxChars) setSmsCompressorMaxChars(data.smsCompressorMaxChars);
+                    if (data.enableManualCompressor !== undefined) setEnableManualCompressor(data.enableManualCompressor);
+                    if (data.enableGeminiCompressor !== undefined) setEnableGeminiCompressor(data.enableGeminiCompressor);
+                    if (data.showSmsCompressorLink !== undefined) setShowSmsCompressorLink(data.showSmsCompressorLink);
                 }
                 setLoading(false);
             })
@@ -77,7 +83,10 @@ export default function AdminSettingsPage() {
                     supportEmail,
                     rateLimitPerHour,
                     smsCompressorProvider,
-                    smsCompressorMaxChars
+                    smsCompressorMaxChars,
+                    enableManualCompressor,
+                    enableGeminiCompressor,
+                    showSmsCompressorLink
                 }),
             });
             if (!res.ok) throw new Error("Failed to save");
@@ -342,16 +351,53 @@ export default function AdminSettingsPage() {
 
                         <div className="space-y-6">
                             <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <h3 className="font-medium text-gray-900 mb-4">Availability</h3>
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <div className="font-medium text-gray-900">Enable Manual Mode</div>
+                                            <div className="text-sm text-gray-500">Allow users to use the RISEN Prompt Generator.</div>
+                                        </div>
+                                        <Switch
+                                            checked={enableManualCompressor}
+                                            onCheckedChange={setEnableManualCompressor}
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <div className="font-medium text-gray-900">Enable AI Mode</div>
+                                            <div className="text-sm text-gray-500">Allow users to use Gemini AI compression.</div>
+                                        </div>
+                                        <Switch
+                                            checked={enableGeminiCompressor}
+                                            onCheckedChange={setEnableGeminiCompressor}
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                                        <div>
+                                            <div className="font-medium text-gray-900">Show Link in Footer</div>
+                                            <div className="text-sm text-gray-500">Display the "Compressor" link in the application footer.</div>
+                                        </div>
+                                        <Switch
+                                            checked={showSmsCompressorLink}
+                                            onCheckedChange={setShowSmsCompressorLink}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                                 <h3 className="font-medium text-gray-900 mb-4">Default Mode</h3>
                                 <div className="space-y-3">
-                                    <p className="text-sm text-gray-500 mb-2">Select the initial mode users will see. They can switch between modes freely.</p>
-                                    <label className="flex items-center gap-3 p-3 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                                    <p className="text-sm text-gray-500 mb-2">Select the initial mode users will see.</p>
+                                    <label className={`flex items-center gap-3 p-3 bg-white border rounded-lg transition-colors ${!enableManualCompressor ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-blue-500'}`}>
                                         <input
                                             type="radio"
                                             name="provider"
                                             value="risen"
                                             checked={smsCompressorProvider === "risen"}
-                                            onChange={(e) => setSmsCompressorProvider("risen")}
+                                            onChange={(e) => enableManualCompressor && setSmsCompressorProvider("risen")}
+                                            disabled={!enableManualCompressor}
                                             className="w-4 h-4 text-blue-600 focus:ring-blue-500"
                                         />
                                         <div>
@@ -359,13 +405,14 @@ export default function AdminSettingsPage() {
                                             <div className="text-sm text-gray-500">Generates engineered prompts for use with any LLM (Manual).</div>
                                         </div>
                                     </label>
-                                    <label className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                                    <label className={`flex items-center gap-3 p-3 bg-white border rounded-lg transition-colors ${!enableGeminiCompressor ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-blue-500'}`}>
                                         <input
                                             type="radio"
                                             name="provider"
                                             value="gemini"
                                             checked={smsCompressorProvider === "gemini"}
-                                            onChange={(e) => setSmsCompressorProvider("gemini")}
+                                            onChange={(e) => enableGeminiCompressor && setSmsCompressorProvider("gemini")}
+                                            disabled={!enableGeminiCompressor}
                                             className="w-4 h-4 text-blue-600 focus:ring-blue-500"
                                         />
                                         <div>

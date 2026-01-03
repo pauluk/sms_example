@@ -18,7 +18,10 @@ export async function GET(req: NextRequest) {
         const gdprTeamsConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'show_gdpr_to_teams'));
         const showGdprToTeams = gdprTeamsConfig[0]?.value === 'true';
 
-        return NextResponse.json({ allowedDomains: value, maintenanceMode, showGdprToAdmin, showGdprToTeams });
+        const showLinkConfig = await db.select().from(systemConfig).where(eq(systemConfig.key, 'showSmsCompressorLink'));
+        const showSmsCompressorLink = showLinkConfig[0]?.value !== 'false';
+
+        return NextResponse.json({ allowedDomains: value, maintenanceMode, showGdprToAdmin, showGdprToTeams, showSmsCompressorLink });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
