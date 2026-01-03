@@ -96,6 +96,20 @@ curl_close($curl);
 echo $response;`;
     };
 
+    const generatePowerAutomate = () => {
+        return `1. Add "HTTP" Connector
+2. Method: POST
+3. URI: ${endpoint}
+4. Headers:
+   Authorization: Bearer ${apiKey}
+   Content-Type: application/json
+5. Body:
+{
+  "phoneNumber": "${phoneNumber}",
+  "message": "${message.replace(/"/g, '\\"')}"
+}`;
+    };
+
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
         toast.success("Copied to clipboard");
@@ -247,6 +261,7 @@ echo $response;`;
                                             <TabsTrigger value="node" className="data-[state=active]:bg-slate-800 data-[state=active]:text-slate-100">Node.js</TabsTrigger>
                                             <TabsTrigger value="python" className="data-[state=active]:bg-slate-800 data-[state=active]:text-slate-100">Python</TabsTrigger>
                                             <TabsTrigger value="php" className="data-[state=active]:bg-slate-800 data-[state=active]:text-slate-100">PHP</TabsTrigger>
+                                            <TabsTrigger value="power" className="data-[state=active]:bg-slate-800 data-[state=active]:text-slate-100">Power Automate</TabsTrigger>
                                         </TabsList>
                                         <Button variant="ghost" size="sm" className="h-8 w-8 text-slate-400 hover:text-slate-100 hover:bg-slate-800"
                                             onClick={() => {
@@ -254,6 +269,7 @@ echo $response;`;
                                                 if (activeTab === 'node') copyToClipboard(generateNode());
                                                 if (activeTab === 'python') copyToClipboard(generatePython());
                                                 if (activeTab === 'php') copyToClipboard(generatePhp());
+                                                if (activeTab === 'power') copyToClipboard(generatePowerAutomate());
                                             }}>
                                             <Copy className="h-4 w-4" />
                                         </Button>
@@ -278,6 +294,11 @@ echo $response;`;
                                         <TabsContent value="php" className="mt-0">
                                             <pre className="text-xs font-mono leading-relaxed text-purple-400">
                                                 {generatePhp()}
+                                            </pre>
+                                        </TabsContent>
+                                        <TabsContent value="power" className="mt-0">
+                                            <pre className="text-xs font-mono leading-relaxed text-pink-400">
+                                                {generatePowerAutomate()}
                                             </pre>
                                         </TabsContent>
                                     </div>
