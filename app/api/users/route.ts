@@ -6,11 +6,11 @@ import { NextResponse } from "next/server";
 import { desc, eq, sql } from "drizzle-orm";
 
 export async function GET(req: Request) {
-    const session = await auth.api.getSession({
+    const authSession = await auth.api.getSession({
         headers: await headers()
     });
 
-    if (!session || session.user.role !== 'admin') {
+    if (!authSession || authSession.user.role !== 'admin') {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
