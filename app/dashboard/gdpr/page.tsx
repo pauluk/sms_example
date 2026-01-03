@@ -22,6 +22,13 @@ export default function GDPRPage() {
         e.preventDefault();
         if (!mobile) return;
 
+        // Client-side role check (Backup to proper server-side middleware)
+        // @ts-ignore
+        if (session?.user?.role !== 'admin' && session?.user?.role !== 'gdpr') {
+            toast.error("Unauthorized: You do not have permission.");
+            return;
+        }
+
         setLoading(true);
         setResults(null);
 
