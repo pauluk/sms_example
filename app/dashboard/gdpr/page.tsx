@@ -12,7 +12,10 @@ import { TEAMS } from "@/config/teams";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+import { authClient } from "@/lib/auth-client";
+
 export default function GDPRPage() {
+    const { data: session } = authClient.useSession();
     const [mobile, setMobile] = useState("");
     const [results, setResults] = useState<any[] | null>(null);
     const [loading, setLoading] = useState(false);
