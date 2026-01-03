@@ -113,6 +113,7 @@ const USER_STORIES = [
         story: "I want to assign a restricted 'GDPR' role to users so they can only access the GDPR dashboard for compliance audits.",
         status: "Completed",
         priority: "High"
+    },
     {
         id: "US-013",
         role: "Developer",
