@@ -20,6 +20,7 @@ export default function AdminSettingsPage() {
     const [showGdprToAdmin, setShowGdprToAdmin] = useState(true);
     const [showGdprToTeams, setShowGdprToTeams] = useState(false);
     const [supportEmail, setSupportEmail] = useState("");
+    const [rateLimitPerHour, setRateLimitPerHour] = useState(100);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
@@ -45,6 +46,7 @@ export default function AdminSettingsPage() {
                     if (data.showGdprToAdmin !== undefined) setShowGdprToAdmin(data.showGdprToAdmin);
                     if (data.showGdprToTeams !== undefined) setShowGdprToTeams(data.showGdprToTeams);
                     if (data.supportEmail) setSupportEmail(data.supportEmail);
+                    if (data.rateLimitPerHour !== undefined) setRateLimitPerHour(data.rateLimitPerHour);
                 }
                 setLoading(false);
             })
@@ -69,7 +71,8 @@ export default function AdminSettingsPage() {
                     maintenanceMode,
                     showGdprToAdmin,
                     showGdprToTeams,
-                    supportEmail
+                    supportEmail,
+                    rateLimitPerHour
                 }),
             });
             if (!res.ok) throw new Error("Failed to save");
@@ -212,6 +215,24 @@ export default function AdminSettingsPage() {
                                 onChange={(e) => setSmsQuota(parseInt(e.target.value) || 0)}
                                 className="w-32 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 mt-4">
+                            <div>
+                                <h3 className="font-medium text-gray-900">API Rate Limit (Per Hour)</h3>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Max messages an external API key can send per hour.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="number"
+                                    value={rateLimitPerHour}
+                                    onChange={(e) => setRateLimitPerHour(parseInt(e.target.value) || 0)}
+                                    className="w-24 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                                <span className="text-sm text-gray-500">/hr</span>
+                            </div>
                         </div>
 
                         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 mt-4">
