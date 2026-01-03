@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
             showUserStoriesToTeams,
             maintenanceMode,
             showGdprToAdmin,
-            showGdprToAdmin,
+
             showGdprToTeams,
             supportEmail: (await db.select().from(systemConfig).where(eq(systemConfig.key, 'support_email')))[0]?.value || ''
         });
