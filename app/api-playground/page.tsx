@@ -96,16 +96,23 @@ export default function ApiPlayground() {
                         <CardContent className="space-y-6 flex-1">
                             <div className="space-y-2">
                                 <Label htmlFor="apiKey">API Key (Bearer Token)</Label>
-                                <div className="relative">
+                                <div className="flex gap-2">
                                     <Input
                                         id="apiKey"
-                                        type="password" // partially hide for optics, or show text? Request implied show for testing.
-                                        // Let's us text input but maybe mono font
-                                        className="font-mono text-sm pr-10"
+                                        type="text"
+                                        className="font-mono text-sm flex-1"
                                         value={apiKey}
                                         onChange={(e) => setApiKey(e.target.value)}
                                         placeholder="sk_live_..."
                                     />
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setApiKey("sk_live_" + "X7j9K2mPz4L8nQ5vW1rY3tB6h")}
+                                        title="Use Test Key"
+                                        type="button"
+                                    >
+                                        Use Test Key
+                                    </Button>
                                 </div>
                                 <p className="text-xs text-muted-foreground">Default key pre-filled for testing.</p>
                             </div>
