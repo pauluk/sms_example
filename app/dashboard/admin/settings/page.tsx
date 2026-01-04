@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-import { Save, ShieldAlert, ArrowLeft, MessageSquare, AlertTriangle, ShieldCheck, Sparkles, Wand2 } from "lucide-react";
+import { Save, ShieldAlert, ArrowLeft, MessageSquare, AlertTriangle, ShieldCheck, Sparkles, Wand2, Database } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -123,12 +123,20 @@ export default function AdminSettingsPage() {
                                 <p className="text-sm text-gray-500 mb-4">
                                     Audit system dependencies and check for vulnerabilities.
                                 </p>
-                                <Link href="/dashboard/admin/security">
-                                    <Button variant="outline" className="w-full justify-start">
-                                        <ShieldCheck className="mr-2 h-4 w-4" />
-                                        Run Security Audit
-                                    </Button>
-                                </Link>
+                                <div className="space-y-3">
+                                    <Link href="/dashboard/admin/security">
+                                        <Button variant="outline" className="w-full justify-start">
+                                            <ShieldCheck className="mr-2 h-4 w-4" />
+                                            Run Security Audit
+                                        </Button>
+                                    </Link>
+                                    <Link href="/dashboard/admin/rls">
+                                        <Button variant="outline" className="w-full justify-start text-blue-600 border-blue-200 hover:bg-blue-50">
+                                            <Database className="mr-2 h-4 w-4" />
+                                            RLS Strategy Proposal
+                                        </Button>
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
