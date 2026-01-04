@@ -39,6 +39,13 @@ export function Footer({ user }: { user?: { role?: string } | null }) {
                     >
                         Calculator
                     </Link>
+                    <a
+                        href="/how-to.html"
+                        target="_blank"
+                        className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                    >
+                        How to use
+                    </a>
                     {showLink && (
                         <Link
                             href="/sms-compressor"
@@ -59,6 +66,6 @@ export function Footer({ user }: { user?: { role?: string } | null }) {
                     )}
                 </div>
             </div>
-        </footer>
+        </footer >
     );
 }

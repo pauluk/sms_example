@@ -188,6 +188,11 @@ export default function Home() {
                   {isSignUp ? "Already have an account? Sign In" : "Need an account? Sign Up"}
                 </button>
               </div>
+              <div className="mt-2 text-xs text-gray-500">
+                <a href="/how-to.html" target="_blank" className="hover:text-blue-600 hover:underline">
+                  View How-To Guide
+                </a>
+              </div>
             </>
           )}
           {(view === "magic-link" || view === "forgot-password") && (
