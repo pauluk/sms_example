@@ -64,7 +64,7 @@ export default function GDPRPage() {
 
         doc.setFontSize(10);
         doc.setTextColor(100);
-        doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+        doc.text(`Generated: ${new Date().toLocaleString('en-GB')}`, 14, 30);
         doc.text(`Mobile Number: ${mobile.replace(/\s/g, '')} (Last 10 digits matched)`, 14, 35);
 
 
@@ -99,7 +99,7 @@ export default function GDPRPage() {
             doc.text(`Found ${results.length} record(s) for ${mobile}.`, 20, 66);
 
             const tableData = results.map(log => [
-                new Date(log.sentAt || log.createdAt).toLocaleString(),
+                new Date(log.sentAt || log.createdAt).toLocaleString('en-GB'),
                 TEAMS[log.teamId as keyof typeof TEAMS]?.label || log.teamId,
                 `${log.userName || "Unknown"} (${log.userEmail || ""})`,
                 log.status,
@@ -132,7 +132,7 @@ export default function GDPRPage() {
     const handleExportTXT = () => {
         let content = `GDPR SMS AUDIT REPORT\n`;
         content += `=====================\n`;
-        content += `Generated: ${new Date().toLocaleString()}\n`;
+        content += `Generated: ${new Date().toLocaleString('en-GB')}\n`;
         content += `Mobile Number: ${mobile.replace(/\s/g, '')} (Last 10 digits matched)\n\n`;
 
         if (!results || results.length === 0) {
@@ -145,7 +145,7 @@ export default function GDPRPage() {
 
             results.forEach((log, index) => {
                 content += `RECORD #${index + 1}\n`;
-                content += `Date: ${new Date(log.sentAt || log.createdAt).toLocaleString()}\n`;
+                content += `Date: ${new Date(log.sentAt || log.createdAt).toLocaleString('en-GB')}\n`;
                 content += `Team: ${TEAMS[log.teamId as keyof typeof TEAMS]?.label || log.teamId}\n`;
                 content += `Sent By: ${log.userName || "Unknown"} (${log.userEmail || ""})\n`;
                 content += `Status: ${log.status}\n`;
@@ -266,7 +266,7 @@ export default function GDPRPage() {
                                         {results.map((log) => (
                                             <TableRow key={log.id}>
                                                 <TableCell className="whitespace-nowrap">
-                                                    {new Date(log.sentAt || log.createdAt).toLocaleString()}
+                                                    {new Date(log.sentAt || log.createdAt).toLocaleString('en-GB')}
                                                 </TableCell>
                                                 <TableCell>
                                                     <Badge variant="secondary">
