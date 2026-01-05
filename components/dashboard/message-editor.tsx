@@ -13,13 +13,14 @@ interface MessageEditorProps {
   team: TeamConfig
   example?: { label: string; data: Record<string, string> }
   onBack: () => void
-  onSend: (message: string, scheduledFor?: Date) => Promise<void>
+  onSend: (message: string, recipient: string, scheduledFor?: Date) => Promise<void>
   onSave?: (data: Record<string, string>, message: string) => void
 }
 
 export function MessageEditor({ team, example, onBack, onSend, onSave }: MessageEditorProps) {
   const [formData, setFormData] = useState<Record<string, string>>(example?.data || {})
   const [message, setMessage] = useState("")
+  const [recipient, setRecipient] = useState("")
   const [sending, setSending] = useState(false)
 
   // Generate message preview whenever form data changes
@@ -33,11 +34,11 @@ export function MessageEditor({ team, example, onBack, onSend, onSave }: Message
   }
 
   const handleSend = async () => {
-    if (!message.trim() || message.length > 160) return
+    if (!message.trim() || message.length > 160 || !recipient.trim()) return
 
     setSending(true)
     try {
-      await onSend(message)
+      await onSend(message, recipient)
     } finally {
       setSending(false)
     }
@@ -78,6 +79,23 @@ export function MessageEditor({ team, example, onBack, onSend, onSave }: Message
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Recipient Input */}
+            <div className="space-y-2">
+              <label htmlFor="recipient" className="text-sm font-medium leading-none">
+                Mobile Number
+              </label>
+              <Input
+                id="recipient"
+                type="tel"
+                placeholder="07700 900000"
+                value={recipient}
+                onChange={(e) => setRecipient(e.target.value)}
+                className="focus-visible:ring-yellow-400 font-mono"
+              />
+            </div>
+
+            <div className="h-px bg-border my-4" />
+
             {team.inputs.map((input) => (
               <div key={input.name} className="space-y-2">
                 <label htmlFor={input.name} className="text-sm font-medium leading-none">
@@ -98,7 +116,7 @@ export function MessageEditor({ team, example, onBack, onSend, onSave }: Message
             <div className="flex flex-col sm:flex-row gap-2 pt-4">
               <Button
                 onClick={handleSend}
-                disabled={sending || !message.trim() || message.length > 160}
+                disabled={sending || !message.trim() || message.length > 160 || !recipient.trim()}
                 className="flex-1 govuk-button"
               >
                 <Send className="mr-2 h-4 w-4" />

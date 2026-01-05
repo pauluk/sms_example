@@ -76,7 +76,7 @@ export default function Dashboard() {
     setViewMode("EDITOR")
   }
 
-  const handleSendSMS = async (message: string, scheduledFor?: Date) => {
+  const handleSendSMS = async (message: string, recipient: string, scheduledFor?: Date) => {
     const team = TEAMS[activeTeamKey]
 
     try {
@@ -85,6 +85,7 @@ export default function Dashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message,
+          recipient,
           teamId: team.id,
           scheduledFor: scheduledFor?.toISOString(),
         }),

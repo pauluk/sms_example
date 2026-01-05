@@ -11,12 +11,21 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Play, Copy, Check, Download } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { TEAMS } from "@/config/teams";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 export default function ApiPlayground() {
     // Default values as requested
     const [apiKey, setApiKey] = useState(""); // User must enter key manually due to security policy
     const [phoneNumber, setPhoneNumber] = useState("07879678288");
     const [message, setMessage] = useState("This is a test message from External System A");
+    const [teamId, setTeamId] = useState("accounts-payable");
 
     const [isLoading, setIsLoading] = useState(false);
     const [response, setResponse] = useState<any>(null);
@@ -30,7 +39,8 @@ export default function ApiPlayground() {
   -H "Content-Type: application/json" \\
   -d '{
     "phoneNumber": "${phoneNumber}",
-    "message": "${message.replace(/'/g, "'\\''")}"
+    "message": "${message.replace(/'/g, "'\\''")}",
+    "teamId": "${teamId}"
   }'`;
     };
 
@@ -44,6 +54,7 @@ export default function ApiPlayground() {
   body: JSON.stringify({
     phoneNumber: "${phoneNumber}",
     message: "${message.replace(/"/g, '\\"')}",
+    teamId: "${teamId}",
   }),
 });
 
@@ -61,7 +72,8 @@ headers = {
 }
 data = {
     "phoneNumber": "${phoneNumber}",
-    "message": "${message.replace(/"/g, '\\"')}"
+    "message": "${message.replace(/"/g, '\\"')}",
+    "teamId": "${teamId}"
 }
 
 response = requests.post(url, headers=headers, json=data)
@@ -83,7 +95,8 @@ curl_setopt_array($curl, array(
   CURLOPT_CUSTOMREQUEST => 'POST',
   CURLOPT_POSTFIELDS =>'{
     "phoneNumber": "${phoneNumber}",
-    "message": "${message.replace(/"/g, '\\"')}"
+    "message": "${message.replace(/"/g, '\\"')}",
+    "teamId": "${teamId}"
 }',
   CURLOPT_HTTPHEADER => array(
     'Authorization: Bearer ${apiKey}',
@@ -107,7 +120,8 @@ echo $response;`;
 5. Body:
 {
   "phoneNumber": "${phoneNumber}",
-  "message": "${message.replace(/"/g, '\\"')}"
+  "message": "${message.replace(/"/g, '\\"')}",
+  "teamId": "${teamId}"
 }`;
     };
 
@@ -128,7 +142,8 @@ echo $response;`;
                 },
                 body: JSON.stringify({
                     phoneNumber,
-                    message
+                    message,
+                    teamId
                 })
             });
 
@@ -222,6 +237,30 @@ echo $response;`;
                                     onChange={(e) => setPhoneNumber(e.target.value)}
                                     placeholder="+447700900000"
                                 />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="teamId">Team ID (Optional)</Label>
+                                <Select value={teamId} onValueChange={setTeamId}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a team" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {Object.values(TEAMS).map((team) => (
+                                            <SelectItem key={team.id} value={team.id}>
+                                                {team.label} ({team.id})
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {teamId && (
+                                    <div className="text-xs text-muted-foreground mt-1">
+                                        <span className="font-semibold">Selected Branding (UUID):</span>{" "}
+                                        <code className="bg-muted px-1 py-0.5 rounded">
+                                            {Object.values(TEAMS).find(t => t.id === teamId)?.smsSenderId || "Default"}
+                                        </code>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="space-y-2">
