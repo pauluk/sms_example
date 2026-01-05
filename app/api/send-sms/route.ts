@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { NotifyClient } from 'notifications-node-client';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
-import { GLOBAL_TEMPLATE_ID } from '@/config/teams';
+import { GLOBAL_TEMPLATE_ID, DEFAULT_SENDER_ID, TEAMS } from '@/config/teams';
 import { db } from '@/lib/db';
 import { smsLog, systemConfig } from '@/lib/schema';
 import { nanoid } from 'nanoid';
@@ -55,11 +55,26 @@ export async function POST(req: NextRequest) {
                 return NextResponse.json({ error: "Server Configuration Error: Missing NOTIFY_API_KEY" }, { status: 500 });
             }
 
+            // Determine Sender ID (Branding)
+            // Logic: 1. Try Key lookup, 2. Try ID lookup, 3. Fallback to Default
+            let smsSenderId = DEFAULT_SENDER_ID;
+            const teamByKey = TEAMS[teamId];
+            const teamById = Object.values(TEAMS).find(t => t.id === teamId);
+
+            if (teamByKey?.smsSenderId) {
+                smsSenderId = teamByKey.smsSenderId;
+            } else if (teamById?.smsSenderId) {
+                smsSenderId = teamById.smsSenderId;
+            }
+
+
+
             const notifyClient = new NotifyClient(NOTIFY_API_KEY);
             await notifyClient.sendSms(GLOBAL_TEMPLATE_ID, recipient, {
                 personalisation: {
                     message: message
-                }
+                },
+                smsSenderId: smsSenderId
             });
         }
 

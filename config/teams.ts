@@ -1,10 +1,12 @@
 export const GLOBAL_TEMPLATE_ID = "c3fd072a-48b1-478d-ba99-d6f74a84150d";
+export const DEFAULT_SENDER_ID = "4778eaa6-d552-4bc4-82ad-deaa86ea0385"; // Default (NHSBSAFinOp)
 
 export interface TeamConfig {
     id: string;
     label: string;
     manager: string;
     email: string;
+    smsSenderId?: string;
     inputs: { name: string; label: string; type?: string; placeholder?: string }[];
     examples: { label: string; data: Record<string, string> }[];
     generateMessage: (data: Record<string, string>) => string;
@@ -16,6 +18,7 @@ export const TEAMS: Record<string, TeamConfig> = {
         label: 'Accounts Payable',
         manager: 'Sarah Jenkins',
         email: 'ap@company.com',
+        smsSenderId: 'ed1e3d46-42fa-4b1e-9820-2dfa033f0dc4',
         inputs: [
             { name: "supplierId", label: "Supplier ID", placeholder: "e.g. SUP-001" },
             { name: "invoiceRef", label: "Invoice Ref", placeholder: "e.g. INV-2023-001" },
@@ -35,6 +38,7 @@ export const TEAMS: Record<string, TeamConfig> = {
         label: 'Accounts Receivable',
         manager: 'David Wu',
         email: 'ar@company.com',
+        smsSenderId: '694ea148-e5db-4be7-ab23-24eda544b7a2',
         inputs: [
             { name: "customerName", label: "Customer Name", placeholder: "e.g. Acme Corp" },
             { name: "invoiceNum", label: "Invoice Number", placeholder: "e.g. INV-999" },
@@ -53,6 +57,7 @@ export const TEAMS: Record<string, TeamConfig> = {
         label: 'Treasury',
         manager: 'Ali Khan',
         email: 'treasury@company.com',
+        smsSenderId: '55cf5a53-0322-4cf4-9d29-7f0f299dad17',
         inputs: [
             { name: "reference", label: "Transaction Ref", placeholder: "TRX-001" },
             { name: "counterparty", label: "Counterparty", placeholder: "Bank/Entity Name" },
@@ -71,6 +76,7 @@ export const TEAMS: Record<string, TeamConfig> = {
         label: 'Payroll',
         manager: 'Lisa Wong',
         email: 'payroll@company.com',
+        smsSenderId: 'b35d5180-021c-46ab-a937-23952187c709',
         inputs: [
             { name: "employeeId", label: "Employee ID", placeholder: "EMP-123" },
             { name: "employeeName", label: "Employee Name", placeholder: "John Doe" },

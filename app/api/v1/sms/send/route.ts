@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { GLOBAL_TEMPLATE_ID, DEFAULT_SENDER_ID, TEAMS } from "@/config/teams";
 import { db } from "@/lib/db";
 import { apiKey, smsLog, systemConfig, user } from "@/lib/schema";
 import { eq, and, gt, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { hashKey } from "@/lib/crypto";
 import { NotifyClient } from "notifications-node-client";
-import { GLOBAL_TEMPLATE_ID } from "@/config/teams";
 
 const TEST_PHONE_NUMBER = process.env.TEST_PHONE_NUMBER;
 const NOTIFY_API_KEY = process.env.NOTIFY_API_KEY;
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
 
         // 4. Parse Body
         const body = await req.json();
-        const { message, phoneNumber } = body;
+        const { message, phoneNumber, teamId } = body;
 
         if (!message || !phoneNumber) {
             return NextResponse.json({ error: "Missing required fields: message, phoneNumber" }, { status: 400 });
@@ -83,11 +83,25 @@ export async function POST(req: NextRequest) {
 
         const notifyClient = new NotifyClient(NOTIFY_API_KEY);
 
+        // Determine Sender ID (Allow overrides if teamId provided in body, else Default)
+        let smsSenderId = DEFAULT_SENDER_ID;
+        if (teamId) {
+            const teamByKey = TEAMS[teamId];
+            const teamById = Object.values(TEAMS).find(t => t.id === teamId);
+
+            if (teamByKey?.smsSenderId) {
+                smsSenderId = teamByKey.smsSenderId;
+            } else if (teamById?.smsSenderId) {
+                smsSenderId = teamById.smsSenderId;
+            }
+        }
+
         try {
             await notifyClient.sendSms(GLOBAL_TEMPLATE_ID, recipient, {
                 personalisation: {
                     message: message
-                }
+                },
+                smsSenderId: smsSenderId
             });
         } catch (notifyError: any) {
             // Secure Logging: Don't log full object to avoid leaking headers/keys

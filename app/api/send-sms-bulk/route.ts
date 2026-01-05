@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { NotifyClient } from 'notifications-node-client';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
-import { GLOBAL_TEMPLATE_ID } from '@/config/teams';
+import { GLOBAL_TEMPLATE_ID, DEFAULT_SENDER_ID, TEAMS } from '@/config/teams';
 import { db } from '@/lib/db';
 import { smsLog, systemConfig } from '@/lib/schema';
 import { nanoid } from 'nanoid';
@@ -87,11 +87,26 @@ export async function POST(req: NextRequest) {
           throw new Error(isTestMode ? 'TEST_PHONE_NUMBER not configured' : 'Recipient is required');
         }
 
+        // Determine effective team ID for this row (row specific > batch default)
+        const effectiveTeamId = row.teamId || teamId || 'unknown';
+
+        // Resolve Sender ID
+        let smsSenderId = DEFAULT_SENDER_ID;
+        const teamByKey = TEAMS[effectiveTeamId];
+        const teamById = Object.values(TEAMS).find(t => t.id === effectiveTeamId);
+
+        if (teamByKey?.smsSenderId) {
+          smsSenderId = teamByKey.smsSenderId;
+        } else if (teamById?.smsSenderId) {
+          smsSenderId = teamById.smsSenderId;
+        }
+
         // Send SMS via GOV.UK Notify
         await notifyClient.sendSms(GLOBAL_TEMPLATE_ID, recipient, {
           personalisation: {
             message: row.message
-          }
+          },
+          smsSenderId: smsSenderId
         });
 
         // Log to database
