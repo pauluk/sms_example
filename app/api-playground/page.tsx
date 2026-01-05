@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,8 +30,13 @@ export default function ApiPlayground() {
     const [isLoading, setIsLoading] = useState(false);
     const [response, setResponse] = useState<any>(null);
     const [activeTab, setActiveTab] = useState("curl");
+    const [baseUrl, setBaseUrl] = useState("");
 
-    const endpoint = typeof window !== 'undefined' ? `${window.location.origin}/api/v1/sms/send` : '/api/v1/sms/send';
+    useEffect(() => {
+        setBaseUrl(window.location.origin);
+    }, []);
+
+    const endpoint = baseUrl ? `${baseUrl}/api/v1/sms/send` : '/api/v1/sms/send';
 
     const generateCurl = () => {
         return `curl -X POST ${endpoint} \\
