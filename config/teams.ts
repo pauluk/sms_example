@@ -61,7 +61,7 @@ export const TEAMS: Record<string, TeamConfig> = {
         inputs: [
             { name: "reference", label: "Transaction Ref", placeholder: "TRX-001" },
             { name: "counterparty", label: "Counterparty", placeholder: "Bank/Entity Name" },
-            { name: "currency", label: "Currency", placeholder: "GBP/USD" },
+            { name: "currency", label: "Currency", placeholder: "GBP" },
             { name: "amount", label: "Amount", type: "number", placeholder: "0.00" },
             { name: "action", label: "Action Required", placeholder: "Approval needed" }
         ],
@@ -80,7 +80,7 @@ export const TEAMS: Record<string, TeamConfig> = {
         inputs: [
             { name: "employeeId", label: "Employee ID", placeholder: "EMP-123" },
             { name: "employeeName", label: "Employee Name", placeholder: "John Doe" },
-            { name: "month", label: "Period", placeholder: "January 2024" },
+            { name: "month", label: "Period", placeholder: "January 2026" },
             { name: "netPay", label: "Net Pay", placeholder: "2500.00" }
         ],
         examples: [
